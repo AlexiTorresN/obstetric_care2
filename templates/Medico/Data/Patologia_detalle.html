@@ -1,0 +1,120 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}{{ patologia.nombre }} - Detalle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            
+            <!-- Encabezado -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-file-medical-fill text-primary"></i>
+                    {{ patologia.nombre }}
+                </h2>
+                <a href="{% url 'medico:listar_patologias' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+
+            <!-- Estado y CIE-10 -->
+            <div class="card mb-4">
+                <div class="card-header {% if patologia.estado == 'Activo' %}bg-success{% else %}bg-secondary{% endif %} text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle"></i> Información General
+                        </h5>
+                        {% if patologia.estado == 'Activo' %}
+                            <span class="badge bg-light text-success fs-6">Activa</span>
+                        {% else %}
+                            <span class="badge bg-light text-secondary fs-6">Inactiva</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Código CIE-10:</strong> 
+                                <span class="badge bg-info fs-6">{{ patologia.get_codigo_cie_10_display }}</span>
+                            </p>
+                            <p class="mb-2"><strong>Nivel de Riesgo:</strong>
+                                {% if patologia.nivel_de_riesgo == 'Bajo' %}
+                                    <span class="badge bg-success">Bajo</span>
+                                {% elif patologia.nivel_de_riesgo == 'Medio' %}
+                                    <span class="badge bg-warning text-dark">Medio</span>
+                                {% elif patologia.nivel_de_riesgo == 'Alto' %}
+                                    <span class="badge bg-danger">Alto</span>
+                                {% else %}
+                                    <span class="badge bg-dark">Crítico</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Fichas que la usan:</strong> {{ fichas_usando }}</p>
+                            <p class="mb-2"><strong>Última modificación:</strong> 
+                                {{ patologia.fecha_modificacion|date:"d/m/Y H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-text"></i> Descripción Médica
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ patologia.descripcion }}</p>
+                </div>
+            </div>
+
+            <!-- Protocolo de Seguimiento -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard-check"></i> Protocolo de Seguimiento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0" style="white-space: pre-line;">{{ patologia.protocolo_seguimiento }}</p>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i> Acciones
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'medico:toggle_patologia' patologia.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if patologia.estado == 'Activo' %}
+                            <button type="submit" class="btn btn-secondary" 
+                                    onclick="return confirm('¿Desactivar esta patología? Ya no estará disponible para nuevas fichas.')">
+                                <i class="bi bi-x-circle"></i> Desactivar Patología
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-success" 
+                                    onclick="return confirm('¿Activar esta patología? Estará disponible para asignar a pacientes.')">
+                                <i class="bi bi-check-circle"></i> Activar Patología
+                            </button>
+                        {% endif %}
+                    </form>
+                    
+                    <a href="{% url 'medico:listar_patologias' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver al Catálogo
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

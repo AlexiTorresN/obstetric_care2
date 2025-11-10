@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema Obstétrico - Hospital Herminda Martín{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="bi bi-hospital"></i> Sistema Obstétrico
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <!-- Inicio -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    
+                    <!-- Médico -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-clipboard2-pulse"></i> Médico
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'medico:menu_medico' %}">
+                                <i class="bi bi-house-door"></i> Menú Médico
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Catálogo de Patologías</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'medico:listar_patologias' %}">
+                                <i class="bi bi-journal-medical"></i> Ver Catálogo
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'medico:registrar_patologia' %}">
+                                <i class="bi bi-plus-circle"></i> Registrar Patología
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Historial Clínico</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'medico:buscar_paciente' %}">
+                                <i class="bi bi-search"></i> Buscar Paciente
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Matrona -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-heart-pulse"></i> Matrona
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'matrona:menu_matrona' %}">
+                                <i class="bi bi-house-door"></i> Menú Matrona
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Pacientes</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'matrona:registrar_paciente' %}">
+                                <i class="bi bi-person-plus"></i> Registrar Paciente
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'matrona:lista_pacientes' %}">
+                                <i class="bi bi-people"></i> Ver Pacientes
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'matrona:buscar_paciente' %}">
+                                <i class="bi bi-search"></i> Buscar Paciente
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Fichas Obstétricas</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'matrona:seleccionar_paciente_ficha' %}">
+                                <i class="bi bi-file-earmark-plus"></i> Nueva Ficha
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'matrona:todas_fichas' %}">
+                                <i class="bi bi-folder-fill"></i> Ver Todas las Fichas
+                            </a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Tens -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-badge"></i> Tens
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'tens:menu_tens' %}">
+                                <i class="bi bi-house-door"></i> Menú Tens
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Funciones Tens</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'tens:buscar_paciente' %}">
+                                <i class="bi bi-search"></i> Buscar Paciente
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'tens:parametros_tens' %}">
+                                <i class="bi bi-clipboard2-pulse"></i> Registrar Signos Vitales
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Gestión -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Gestión
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'gestion:registrar_persona' %}">
+                                <i class="bi bi-person-plus"></i> Registrar Persona
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'gestion:lista_personas' %}">
+                                <i class="bi bi-list-ul"></i> Ver Personas
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <!-- Usuario -->
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> Usuario
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-gear"></i> Configuración
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Mensajes -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Contenido Principal -->
+    <main class="container-fluid py-4">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">© 2025 Hospital Clínico Herminda Martín - Sistema de Trazabilidad Obstétrica</p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery (opcional) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

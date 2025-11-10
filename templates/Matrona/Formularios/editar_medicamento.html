@@ -1,0 +1,231 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Editar Medicamento - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-warning">
+                <i class="bi bi-capsule-pill"></i> Editar Medicamento
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Información del Contexto -->
+    <div class="row mb-4">
+        <!-- Info del Paciente -->
+        <div class="col-md-6">
+            <div class="card border-info h-100">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Paciente</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Nombre:</strong> {{ paciente.persona.Nombre }} {{ paciente.persona.Apellido_Paterno }}</p>
+                    <p class="mb-0"><strong>RUT:</strong> {{ paciente.persona.Rut }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info de la Ficha -->
+        <div class="col-md-6">
+            <div class="card border-primary h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-file-medical"></i> Ficha</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>N° Ficha:</strong> {{ ficha.pk }}</p>
+                    <p class="mb-0">
+                        <strong>Estado:</strong> 
+                        {% if ficha.activa %}
+                            <span class="badge bg-success">Activa</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Cerrada</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verificar si la ficha está activa -->
+    {% if not ficha.activa %}
+    <div class="alert alert-danger" role="alert">
+        <h5><i class="bi bi-exclamation-octagon"></i> No se puede editar</h5>
+        <p>No se pueden editar medicamentos de una ficha cerrada.</p>
+        <a href="{% url 'matrona:detalle_ficha' ficha.pk %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Detalle
+        </a>
+    </div>
+    {% else %}
+
+    <!-- Formulario de Edición -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Modificar Datos del Medicamento</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" id="formEditarMedicamento">
+                {% csrf_token %}
+                
+                <!-- Mostrar errores -->
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Corrija los siguientes errores:</h5>
+                    {{ form.errors }}
+                </div>
+                {% endif %}
+
+                <!-- Datos Actuales del Medicamento -->
+                <div class="alert alert-info" role="alert">
+                    <h6><i class="bi bi-info-circle"></i> Datos Actuales</h6>
+                    <ul class="mb-0">
+                        <li><strong>Medicamento:</strong> {{ medicamento.get_nombre_medicamento_display }}</li>
+                        <li><strong>Dosis actual:</strong> {{ medicamento.get_dosis_display }}</li>
+                        <li><strong>Frecuencia actual:</strong> {{ medicamento.get_frecuencia_display }}</li>
+                    </ul>
+                </div>
+
+                <div class="row">
+                    <!-- Nombre del Medicamento -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_nombre_medicamento" class="form-label">
+                            Medicamento <span class="text-danger">*</span>
+                        </label>
+                        {{ form.nombre_medicamento }}
+                    </div>
+
+                    <!-- Dosis -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_dosis" class="form-label">
+                            Dosis <span class="text-danger">*</span>
+                        </label>
+                        {{ form.dosis }}
+                    </div>
+
+                    <!-- Vía de Administración -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_via_administracion" class="form-label">
+                            Vía de Administración <span class="text-danger">*</span>
+                        </label>
+                        {{ form.via_administracion }}
+                    </div>
+
+                    <!-- Frecuencia -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_frecuencia" class="form-label">
+                            Frecuencia <span class="text-danger">*</span>
+                        </label>
+                        {{ form.frecuencia }}
+                    </div>
+
+                    <!-- Fecha Inicio -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_fecha_inicio" class="form-label">
+                            Fecha de Inicio <span class="text-danger">*</span>
+                        </label>
+                        {{ form.fecha_inicio }}
+                    </div>
+
+                    <!-- Fecha Término -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_fecha_termino" class="form-label">
+                            Fecha de Término <span class="text-danger">*</span>
+                        </label>
+                        {{ form.fecha_termino }}
+                    </div>
+
+                    <!-- Estado del Medicamento -->
+                    <div class="col-md-12 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <label class="form-label"><strong>Estado del Medicamento</strong></label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="checkActivo" 
+                                           {% if medicamento.activo %}checked{% endif %}
+                                           disabled>
+                                    <label class="form-check-label" for="checkActivo">
+                                        {% if medicamento.activo %}
+                                            <span class="badge bg-success">ACTIVO</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">INACTIVO</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Para desactivar el medicamento, use el botón "Desactivar" en el detalle de la ficha.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="col-12 mb-3">
+                        <label for="id_observaciones" class="form-label">
+                            Observaciones
+                        </label>
+                        {{ form.observaciones }}
+                        <small class="form-text text-muted">
+                            Actualizaciones sobre el tratamiento, reacciones, contraindicaciones, etc.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle"></i> Guardar Cambios
+                        </button>
+                        <a href="{% url 'matrona:detalle_ficha' ficha.pk %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <a href="{% url 'matrona:desactivar_medicamento_ficha' medicamento.pk %}" 
+                           class="btn btn-outline-danger btn-lg float-end">
+                            <i class="bi bi-x-octagon"></i> Desactivar Medicamento
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Historial de Cambios -->
+    <div class="alert alert-secondary mt-4" role="alert">
+        <h6><i class="bi bi-clock-history"></i> Historial</h6>
+        <ul class="mb-0">
+            <li><strong>Creado:</strong> {{ medicamento.fecha_creacion|date:"d/m/Y H:i" }}</li>
+            <li><strong>Última modificación:</strong> {{ medicamento.fecha_actualizacion|date:"d/m/Y H:i" }}</li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación de fechas
+document.getElementById('formEditarMedicamento')?.addEventListener('submit', function(e) {
+    const fechaInicio = document.getElementById('id_fecha_inicio').value;
+    const fechaTermino = document.getElementById('id_fecha_termino').value;
+    
+    if (fechaInicio && fechaTermino && new Date(fechaTermino) < new Date(fechaInicio)) {
+        e.preventDefault();
+        alert('❌ La fecha de término debe ser posterior o igual a la fecha de inicio');
+        return false;
+    }
+    
+    // Confirmación
+    const confirmacion = confirm('¿Confirma que desea guardar los cambios en el medicamento?');
+    if (!confirmacion) {
+        e.preventDefault();
+    }
+});
+
+console.log('✅ Formulario de editar medicamento cargado');
+</script>
+{% endblock %}

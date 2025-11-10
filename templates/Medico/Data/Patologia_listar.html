@@ -1,0 +1,281 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Catálogo de Patologías - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-journal-medical text-primary"></i>
+            Catálogo de Patologías Obstétricas
+        </h2>
+        <a href="{% url 'medico:menu_medico' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Menú
+        </a>
+    </div>
+
+    <!-- Información del sistema -->
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>Información:</strong> Este catálogo contiene patologías obstétricas predefinidas con información médica completa. 
+        Solo debe <strong>activar</strong> las patologías que se utilizan en este hospital.
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-funnel"></i> Filtros de Búsqueda
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Buscar por nombre o código</label>
+                    <input type="text" 
+                           name="busqueda" 
+                           class="form-control" 
+                           placeholder="Ej: Diabetes, O24..."
+                           value="{{ busqueda }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Nivel de Riesgo</label>
+                    <select name="nivel_riesgo" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="Bajo" {% if nivel_riesgo == 'Bajo' %}selected{% endif %}>
+                            Bajo
+                        </option>
+                        <option value="Medio" {% if nivel_riesgo == 'Medio' %}selected{% endif %}>
+                            Medio
+                        </option>
+                        <option value="Alto" {% if nivel_riesgo == 'Alto' %}selected{% endif %}>
+                            Alto
+                        </option>
+                        <option value="Crítico" {% if nivel_riesgo == 'Crítico' %}selected{% endif %}>
+                            Crítico
+                        </option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="Activo" {% if estado == 'Activo' %}selected{% endif %}>
+                            ✅ Activo
+                        </option>
+                        <option value="Inactivo" {% if estado == 'Inactivo' %}selected{% endif %}>
+                            ❌ Inactivo
+                        </option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Patologías -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if patologias %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%;">Nombre</th>
+                                <th style="width: 15%;">Código CIE-10</th>
+                                <th style="width: 15%;">Nivel de Riesgo</th>
+                                <th style="width: 20%;">Descripción</th>
+                                <th style="width: 10%;">Estado</th>
+                                <th style="width: 10%;">Uso</th>
+                                <th style="width: 15%;" class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patologia in patologias %}
+                            <tr {% if patologia.estado == 'Inactivo' %}class="table-secondary"{% endif %}>
+                                <td>
+                                    <strong>{{ patologia.nombre }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        {{ patologia.codigo_cie_10 }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if patologia.nivel_de_riesgo == 'Bajo' %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Bajo
+                                        </span>
+                                    {% elif patologia.nivel_de_riesgo == 'Medio' %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-exclamation-circle"></i> Medio
+                                        </span>
+                                    {% elif patologia.nivel_de_riesgo == 'Alto' %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-triangle"></i> Alto
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-dark">
+                                            <i class="bi bi-x-octagon"></i> Crítico
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ patologia.descripcion|truncatewords:15 }}</small>
+                                </td>
+                                <td>
+                                    {% if patologia.estado == 'Activo' %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Activa
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-x-circle"></i> Inactiva
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if patologia.num_fichas > 0 %}
+                                        <span class="badge bg-primary">
+                                            {{ patologia.num_fichas }} ficha{{ patologia.num_fichas|pluralize }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">Sin uso</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'medico:detalle_patologia' patologia.pk %}" 
+                                           class="btn btn-sm btn-info" 
+                                           title="Ver detalle completo">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        
+                                        <form method="POST" 
+                                              action="{% url 'medico:toggle_patologia' patologia.pk %}" 
+                                              class="d-inline">
+                                            {% csrf_token %}
+                                            {% if patologia.estado == 'Activo' %}
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-secondary" 
+                                                        title="Desactivar"
+                                                        onclick="return confirm('¿Desactivar esta patología?')">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            {% else %}
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-success" 
+                                                        title="Activar"
+                                                        onclick="return confirm('¿Activar esta patología?')">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Resumen -->
+                <div class="alert alert-light mt-3 mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Total:</strong> {{ patologias.count }} patología{{ patologias.count|pluralize }} encontrada{{ patologias.count|pluralize }}
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>No se encontraron patologías.</strong>
+                    {% if busqueda or estado or nivel_riesgo %}
+                        <br>
+                        Intente modificar los filtros de búsqueda.
+                        <a href="{% url 'medico:listar_patologias' %}" class="btn btn-sm btn-outline-warning ms-2">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar filtros
+                        </a>
+                    {% else %}
+                        <br>
+                        No hay patologías cargadas en el sistema.
+                        <br><br>
+                        <strong>Para cargar las patologías predefinidas, ejecute:</strong>
+                        <br>
+                        <code>python manage.py cargar_patologias</code>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Leyenda de colores -->
+    <div class="card mt-4 border-info">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0">
+                <i class="bi bi-palette"></i> Leyenda de Niveles de Riesgo
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <span class="badge bg-success p-2">
+                        <i class="bi bi-check-circle"></i> Bajo
+                    </span>
+                    <p class="small text-muted mb-0 mt-1">Control prenatal estándar</p>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-warning text-dark p-2">
+                        <i class="bi bi-exclamation-circle"></i> Medio
+                    </span>
+                    <p class="small text-muted mb-0 mt-1">Requiere seguimiento más frecuente</p>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-danger p-2">
+                        <i class="bi bi-exclamation-triangle"></i> Alto
+                    </span>
+                    <p class="small text-muted mb-0 mt-1">Control especializado y frecuente</p>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-dark p-2">
+                        <i class="bi bi-x-octagon"></i> Crítico
+                    </span>
+                    <p class="small text-muted mb-0 mt-1">Requiere atención inmediata</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+    
+    .btn-group .btn {
+        border-radius: 0;
+    }
+    
+    .btn-group .btn:first-child {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+    
+    .btn-group .btn:last-child {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
+</style>
+{% endblock %}

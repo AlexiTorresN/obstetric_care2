@@ -1,0 +1,250 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Detalle Persona - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-person-badge"></i> Información de Persona
+                </h4>
+                <a href="{% url 'gestion:gestionar_roles' persona.pk %}" class="btn btn-warning btn-sm">
+                    <i class="bi bi-person-gear"></i> Gestionar Roles
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="row">
+                <!-- Datos Personales -->
+                <div class="col-md-6 mb-4">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-person-circle"></i> Datos Personales
+                    </h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="40%">RUT:</th>
+                            <td><strong>{{ persona.Rut }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Nombre Completo:</th>
+                            <td>{{ persona.Nombre }} {{ persona.Apellido }}</td>
+                        </tr>
+                        <tr>
+                            <th>Sexo:</th>
+                            <td>
+                                {% if persona.Sexo == 'Masculino' %}
+                                    <i class="bi bi-gender-male text-primary"></i>
+                                {% else %}
+                                    <i class="bi bi-gender-female text-danger"></i>
+                                {% endif %}
+                                {{ persona.Sexo }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Fecha Nacimiento:</th>
+                            <td>{{ persona.Fecha_nacimiento|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Edad:</th>
+                            <td>{{ persona.calcular_edad }} años</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Datos de Contacto -->
+                <div class="col-md-6 mb-4">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-telephone"></i> Datos de Contacto
+                    </h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="40%">Teléfono:</th>
+                            <td>
+                                {% if persona.Telefono %}
+                                    <i class="bi bi-telephone-fill text-success"></i> {{ persona.Telefono }}
+                                {% else %}
+                                    <span class="text-muted">No registrado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>
+                                {% if persona.Email %}
+                                    <i class="bi bi-envelope-fill text-info"></i> {{ persona.Email }}
+                                {% else %}
+                                    <span class="text-muted">No registrado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Dirección:</th>
+                            <td>
+                                {% if persona.Direccion %}
+                                    <i class="bi bi-geo-alt-fill text-warning"></i> {{ persona.Direccion }}
+                                {% else %}
+                                    <span class="text-muted">No registrada</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td>
+                                {% if persona.Activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Fecha Registro:</th>
+                            <td>{{ persona.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Roles Asignados -->
+            <div class="mb-4">
+                <h5 class="text-primary border-bottom pb-2">
+                    <i class="bi bi-shield-check"></i> Roles Asignados
+                </h5>
+                <div class="row">
+                    <!-- Paciente -->
+                    <div class="col-md-3 mb-3">
+                        <div class="card {% if persona.paciente %}border-danger{% else %}border-secondary opacity-50{% endif %}">
+                            <div class="card-body text-center">
+                                <i class="bi bi-person-hearts {% if persona.paciente %}text-danger{% else %}text-secondary{% endif %}" 
+                                   style="font-size: 2.5rem;"></i>
+                                <h6 class="mt-2">Paciente</h6>
+                                {% if persona.paciente %}
+                                    <span class="badge bg-danger">Asignado</span>
+                                    <div class="mt-2 small">
+                                        <i class="bi bi-calendar"></i> 
+                                        {{ persona.paciente.fecha_creacion|date:"d/m/Y" }}
+                                    </div>
+                                {% else %}
+                                    <span class="badge bg-secondary">No asignado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Médico -->
+                    <div class="col-md-3 mb-3">
+                        <div class="card {% if persona.medico %}border-success{% else %}border-secondary opacity-50{% endif %}">
+                            <div class="card-body text-center">
+                                <i class="bi bi-clipboard2-pulse {% if persona.medico %}text-success{% else %}text-secondary{% endif %}" 
+                                   style="font-size: 2.5rem;"></i>
+                                <h6 class="mt-2">Médico</h6>
+                                {% if persona.medico %}
+                                    <span class="badge bg-success">Asignado</span>
+                                    <div class="mt-2 small">
+                                        <strong>{{ persona.medico.Especialidad }}</strong><br>
+                                        Reg: {{ persona.medico.Registro_medico }}
+                                    </div>
+                                {% else %}
+                                    <span class="badge bg-secondary">No asignado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matrona -->
+                    <div class="col-md-3 mb-3">
+                        <div class="card {% if persona.matrona %}border-info{% else %}border-secondary opacity-50{% endif %}">
+                            <div class="card-body text-center">
+                                <i class="bi bi-heart-pulse {% if persona.matrona %}text-info{% else %}text-secondary{% endif %}" 
+                                   style="font-size: 2.5rem;"></i>
+                                <h6 class="mt-2">Matrona</h6>
+                                {% if persona.matrona %}
+                                    <span class="badge bg-info text-dark">Asignado</span>
+                                    <div class="mt-2 small">
+                                        <strong>{{ persona.matrona.Area_especialidad }}</strong><br>
+                                        {{ persona.matrona.Anos_experiencia }} años exp.
+                                    </div>
+                                {% else %}
+                                    <span class="badge bg-secondary">No asignado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TENS -->
+                    <div class="col-md-3 mb-3">
+                        <div class="card {% if persona.tens %}border-warning{% else %}border-secondary opacity-50{% endif %}">
+                            <div class="card-body text-center">
+                                <i class="bi bi-bandaid {% if persona.tens %}text-warning{% else %}text-secondary{% endif %}" 
+                                   style="font-size: 2.5rem;"></i>
+                                <h6 class="mt-2">TENS</h6>
+                                {% if persona.tens %}
+                                    <span class="badge bg-warning text-dark">Asignado</span>
+                                    <div class="mt-2 small">
+                                        <strong>{{ persona.tens.Nivel_certificacion }}</strong><br>
+                                        Turno: {{ persona.tens.Turno }}
+                                    </div>
+                                {% else %}
+                                    <span class="badge bg-secondary">No asignado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="alert alert-light">
+                <h6><i class="bi bi-lightning-charge"></i> Acciones Rápidas</h6>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'gestion:gestionar_roles' persona.pk %}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-person-gear"></i> Gestionar Roles
+                    </a>
+                    {% if persona.paciente %}
+                        <a href="#" class="btn btn-danger btn-sm">
+                            <i class="bi bi-file-earmark-medical"></i> Ver Ficha Obstétrica
+                        </a>
+                    {% endif %}
+                    {% if persona.medico or persona.matrona %}
+                        <a href="#" class="btn btn-success btn-sm">
+                            <i class="bi bi-calendar-check"></i> Ver Agenda
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'gestion:lista_personas' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Lista
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Ir al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Detalle de persona cargado:', {
+    rut: '{{ persona.Rut }}',
+    nombre: '{{ persona.Nombre }} {{ persona.Apellido }}',
+    roles: {
+        paciente: {{ persona.paciente|yesno:"true,false" }},
+        medico: {{ persona.medico|yesno:"true,false" }},
+        matrona: {{ persona.matrona|yesno:"true,false" }},
+        tens: {{ persona.tens|yesno:"true,false" }}
+    }
+});
+</script>
+{% endblock %}

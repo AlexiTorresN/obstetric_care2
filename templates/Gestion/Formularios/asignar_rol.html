@@ -1,0 +1,105 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Asignar Rol {{ rol_nombre }} - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Información de Persona -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-badge"></i> Asignar Rol: {{ rol_nombre }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>RUT:</strong> {{ persona.Rut }}</p>
+                            <p class="mb-1"><strong>Nombre:</strong> {{ persona.Nombre }} {{ persona.Apellido }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Sexo:</strong> {{ persona.Sexo }}</p>
+                            <p class="mb-1"><strong>Fecha Nacimiento:</strong> {{ persona.Fecha_nacimiento|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Asignación -->
+            <div class="card shadow-sm">
+                <div class="card-header 
+                    {% if rol_nombre == 'Paciente' %}bg-danger{% endif %}
+                    {% if rol_nombre == 'Médico' %}bg-success{% endif %}
+                    {% if rol_nombre == 'Matrona' %}bg-info{% endif %}
+                    {% if rol_nombre == 'TENS' %}bg-warning text-dark{% endif %}
+                    text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text"></i> Datos del Rol {{ rol_nombre }}
+                    </h5>
+                </div>
+                
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Renderizado automático de todos los campos -->
+                        {% for field in form %}
+                            {% if field.name != 'rut_persona' %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small">{{ field.errors }}</div>
+                                {% endif %}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'gestion:gestionar_roles' persona.pk %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn 
+                                {% if rol_nombre == 'Paciente' %}btn-danger{% endif %}
+                                {% if rol_nombre == 'Médico' %}btn-success{% endif %}
+                                {% if rol_nombre == 'Matrona' %}btn-info{% endif %}
+                                {% if rol_nombre == 'TENS' %}btn-warning{% endif %}">
+                                <i class="bi bi-check-circle"></i> Asignar Rol {{ rol_nombre }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="alert alert-light mt-3">
+                <i class="bi bi-lightbulb"></i>
+                <strong>Nota:</strong> Una persona puede tener múltiples roles simultáneamente. 
+                Puede asignar más roles desde la gestión de roles.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Formulario de asignación de rol cargado:', {
+    persona: '{{ persona.Rut }}',
+    rol: '{{ rol_nombre }}'
+});
+</script>
+{% endblock %}

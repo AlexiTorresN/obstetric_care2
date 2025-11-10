@@ -1,0 +1,269 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Matronas - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-heart-pulse"></i> Matronas Registradas
+                </h4>
+                <a href="{% url 'gestion:registrar_matrona' %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Nueva Matrona
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Buscador y Filtros -->
+            <div class="row mb-4">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="buscar-matrona" 
+                               placeholder="Buscar por nombre, RUT o especialidad...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtro-area">
+                        <option value="">Todas las áreas</option>
+                        <option value="Prenatal">Prenatal</option>
+                        <option value="Parto">Parto</option>
+                        <option value="Puerperio">Puerperio</option>
+                        <option value="Alto Riesgo">Alto Riesgo</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="filtro-turno">
+                        <option value="">Todos</option>
+                        <option value="Diurno">Diurno</option>
+                        <option value="Vespertino">Vespertino</option>
+                        <option value="Nocturno">Nocturno</option>
+                        <option value="Rotativo">Rotativo</option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-end">
+                    <span class="badge bg-info text-dark fs-6">
+                        Total: {{ matronas.count }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla de Matronas -->
+            {% if matronas %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-info">
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre Completo</th>
+                            <th>Área Especialidad</th>
+                            <th>Registro Profesional</th>
+                            <th>Años Experiencia</th>
+                            <th>Turno</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-matronas">
+                        {% for matrona in matronas %}
+                        <tr data-nombre="{{ matrona.rut_persona.Nombre|lower }} {{ matrona.rut_persona.Apellido|lower }}"
+                            data-rut="{{ matrona.rut_persona.Rut }}"
+                            data-area="{{ matrona.Area_especialidad }}"
+                            data-turno="{{ matrona.Turno }}">
+                            <td><strong>{{ matrona.rut_persona.Rut }}</strong></td>
+                            <td>
+                                <i class="bi bi-person-fill text-info"></i>
+                                {{ matrona.rut_persona.Nombre }} {{ matrona.rut_persona.Apellido }}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ matrona.Area_especialidad }}</span>
+                            </td>
+                            <td>{{ matrona.Registro_profesional }}</td>
+                            <td>
+                                <i class="bi bi-award"></i> {{ matrona.Anos_experiencia }} años
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if matrona.Turno == 'Diurno' %}bg-warning text-dark{% endif %}
+                                    {% if matrona.Turno == 'Vespertino' %}bg-info{% endif %}
+                                    {% if matrona.Turno == 'Nocturno' %}bg-dark{% endif %}
+                                    {% if matrona.Turno == 'Rotativo' %}bg-primary{% endif %}">
+                                    {{ matrona.Turno }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if matrona.rut_persona.Activo %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Activa
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Inactiva
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'gestion:detalle_persona' matrona.rut_persona.pk %}" 
+                                       class="btn btn-outline-primary" 
+                                       title="Ver Perfil">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'matrona:dashboard' %}" 
+                                       class="btn btn-outline-info" 
+                                       title="Dashboard Matrona">
+                                        <i class="bi bi-speedometer2"></i>
+                                    </a>
+                                    <a href="{% url 'gestion:gestionar_roles' matrona.rut_persona.pk %}" 
+                                       class="btn btn-outline-warning" 
+                                       title="Gestionar Roles">
+                                        <i class="bi bi-person-gear"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Estadísticas por Área -->
+            <div class="row mt-4">
+                <div class="col-md-12 mb-3">
+                    <h6><i class="bi bi-bar-chart"></i> Distribución por Área de Especialidad</h6>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h5 class="text-primary">{{ stats.prenatal }}</h5>
+                            <small class="text-muted">Prenatal</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <h5 class="text-success">{{ stats.parto }}</h5>
+                            <small class="text-muted">Parto</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <h5 class="text-info">{{ stats.puerperio }}</h5>
+                            <small class="text-muted">Puerperio</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-danger">
+                        <div class="card-body text-center">
+                            <h5 class="text-danger">{{ stats.alto_riesgo }}</h5>
+                            <small class="text-muted">Alto Riesgo</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribución por Turno -->
+            <div class="row mt-3">
+                <div class="col-md-12 mb-3">
+                    <h6><i class="bi bi-clock"></i> Distribución por Turno</h6>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-warning">
+                        <div class="card-body text-center">
+                            <h5 class="text-warning">{{ stats.diurno }}</h5>
+                            <small class="text-muted">Diurno</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <h5 class="text-info">{{ stats.vespertino }}</h5>
+                            <small class="text-muted">Vespertino</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-dark">
+                        <div class="card-body text-center">
+                            <h5 class="text-dark">{{ stats.nocturno }}</h5>
+                            <small class="text-muted">Nocturno</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h5 class="text-primary">{{ stats.rotativo }}</h5>
+                            <small class="text-muted">Rotativo</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>No hay matronas registradas.</strong>
+                <br>
+                <a href="{% url 'gestion:registrar_matrona' %}" class="btn btn-info btn-sm mt-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Primera Matrona
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'gestion:lista_personas' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Personas
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Ir al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Búsqueda y filtros
+document.getElementById('buscar-matrona').addEventListener('input', filtrarTabla);
+document.getElementById('filtro-area').addEventListener('change', filtrarTabla);
+document.getElementById('filtro-turno').addEventListener('change', filtrarTabla);
+
+function filtrarTabla() {
+    const searchTerm = document.getElementById('buscar-matrona').value.toLowerCase();
+    const area = document.getElementById('filtro-area').value;
+    const turno = document.getElementById('filtro-turno').value;
+    const rows = document.querySelectorAll('#tabla-matronas tr');
+    
+    rows.forEach(row => {
+        const nombre = row.dataset.nombre || '';
+        const rut = row.dataset.rut || '';
+        const ar = row.dataset.area || '';
+        const tur = row.dataset.turno || '';
+        
+        const matchSearch = nombre.includes(searchTerm) || rut.includes(searchTerm) || ar.toLowerCase().includes(searchTerm);
+        const matchArea = !area || ar === area;
+        const matchTurno = !turno || tur === turno;
+        
+        row.style.display = (matchSearch && matchArea && matchTurno) ? '' : 'none';
+    });
+}
+
+console.log('✅ Lista de matronas cargada:', {{ matronas.count }});
+</script>
+{% endblock %}

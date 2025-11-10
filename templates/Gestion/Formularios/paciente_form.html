@@ -1,0 +1,224 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Formulario de Paciente - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-hearts"></i> Asignar Rol de Paciente
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    {% if persona %}
+                    <!-- Modo: Asignar rol a persona existente -->
+                    <div class="alert alert-light border mb-3">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="mb-1"><strong>RUT:</strong> {{ persona.Rut }}</p>
+                                <p class="mb-1"><strong>Nombre:</strong> {{ persona.Nombre }} {{ persona.Apellido }}</p>
+                                <p class="mb-0"><strong>Sexo:</strong> {{ persona.Sexo }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <span class="badge bg-danger fs-6">Asignar Rol Paciente</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Modo: Búsqueda de persona -->
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Paso 1:</strong> Busque la persona por RUT para asignar el rol de Paciente.
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="buscar-rut" class="form-label">
+                            RUT de la Persona <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg" id="buscar-rut" 
+                                   placeholder="Ej: 12345678-9" autofocus>
+                            <button class="btn btn-primary" type="button" id="btn-buscar">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Ingrese el RUT sin puntos, con guión</small>
+                    </div>
+                    
+                    <div id="persona-info"></div>
+                    <hr>
+                    {% endif %}
+                    
+                    <form method="POST" id="form-paciente" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if not persona %}
+                        <!-- Campo oculto para RUT (cuando se busca) -->
+                        <input type="hidden" name="rut_persona" id="rut_persona">
+                        {% endif %}
+                        
+                        <h5 class="text-danger border-bottom pb-2 mb-3">
+                            <i class="bi bi-card-text"></i> Datos del Paciente
+                        </h5>
+                        
+                        <!-- Edad -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.Edad.id_for_label }}" class="form-label">
+                                    Edad <span class="text-danger">*</span>
+                                </label>
+                                {{ form.Edad }}
+                                {% if form.Edad.errors %}
+                                    <div class="text-danger small">{{ form.Edad.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Edad actual en años</small>
+                            </div>
+                        </div>
+                        
+                        <h5 class="text-danger border-bottom pb-2 mb-3 mt-4">
+                            <i class="bi bi-people-fill"></i> Datos del Acompañante
+                        </h5>
+                        
+                        <!-- Acompañante -->
+                        <div class="mb-3">
+                            <label for="{{ form.Acompanante.id_for_label }}" class="form-label">
+                                Nombre del Acompañante
+                            </label>
+                            {{ form.Acompanante }}
+                            {% if form.Acompanante.errors %}
+                                <div class="text-danger small">{{ form.Acompanante.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Persona que acompañará durante la atención</small>
+                        </div>
+                        
+                        <!-- Contacto de Emergencia -->
+                        <div class="mb-3">
+                            <label for="{{ form.Contacto_emergencia.id_for_label }}" class="form-label">
+                                Contacto de Emergencia <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Contacto_emergencia }}
+                            {% if form.Contacto_emergencia.errors %}
+                                <div class="text-danger small">{{ form.Contacto_emergencia.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Formato: +56912345678</small>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-exclamation-triangle"></i> Información Importante
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Asegúrese de que los datos de contacto estén actualizados</li>
+                                <li>El contacto de emergencia debe ser una persona mayor de edad</li>
+                                <li>Podrá crear la ficha obstétrica después de registrar el paciente</li>
+                            </ul>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if persona %}{% url 'gestion:gestionar_roles' persona.pk %}{% else %}{% url 'gestion:lista_personas' %}{% endif %}" 
+                               class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-save"></i> Guardar Paciente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if not persona %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="bi bi-question-circle"></i> ¿La persona no está registrada?</h6>
+                    <p class="mb-0">
+                        Debe <a href="{% url 'gestion:registrar_persona' %}" target="_blank">registrar los datos básicos de la persona</a> 
+                        antes de asignar el rol de Paciente.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not persona %}
+<script src="{% static 'js/buscar_persona.js' %}"></script>
+<script>
+// Búsqueda manual con botón
+document.getElementById('btn-buscar').addEventListener('click', function() {
+    const rut = document.getElementById('buscar-rut').value.trim();
+    
+    if (!rut) {
+        alert('Por favor ingrese un RUT');
+        return;
+    }
+    
+    // Buscar persona
+    fetch(`/gestion/api/persona/buscar/?rut=${encodeURIComponent(rut)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.encontrado) {
+                document.getElementById('persona-info').innerHTML = `
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-check-circle"></i> Persona Encontrada
+                        </h6>
+                        <p class="mb-1"><strong>Nombre:</strong> ${data.persona.nombre_completo}</p>
+                        <p class="mb-1"><strong>RUT:</strong> ${data.persona.rut}</p>
+                        <p class="mb-0"><strong>Sexo:</strong> ${data.persona.sexo}</p>
+                    </div>
+                `;
+                document.getElementById('rut_persona').value = data.persona.rut;
+                
+                // Habilitar formulario
+                document.getElementById('form-paciente').style.display = 'block';
+            } else {
+                document.getElementById('persona-info').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>Persona no encontrada</strong>
+                        <p class="mb-0 mt-2">
+                            <a href="/gestion/persona/registrar/" class="btn btn-sm btn-warning">
+                                <i class="bi bi-plus-circle"></i> Registrar Persona Nueva
+                            </a>
+                        </p>
+                    </div>
+                `;
+                document.getElementById('form-paciente').style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al buscar persona');
+        });
+});
+
+// Enter en campo RUT
+document.getElementById('buscar-rut').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btn-buscar').click();
+    }
+});
+
+// Ocultar formulario inicialmente
+{% if not persona %}
+document.getElementById('form-paciente').style.display = 'none';
+{% endif %}
+</script>
+{% endif %}
+
+<script>
+console.log('✅ Formulario de paciente cargado');
+</script>
+{% endblock %}

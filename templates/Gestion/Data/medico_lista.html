@@ -1,0 +1,171 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Médicos - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-clipboard2-pulse"></i> Médicos Registrados
+                </h4>
+                <a href="{% url 'gestion:registrar_medico' %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Nuevo Médico
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Buscador y Filtros -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="buscar-medico" 
+                               placeholder="Buscar por nombre, RUT o especialidad...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtro-especialidad">
+                        <option value="">Todas las especialidades</option>
+                        <option value="Ginecología">Ginecología</option>
+                        <option value="Obstetricia">Obstetricia</option>
+                        <option value="Medicina General">Medicina General</option>
+                        <option value="Pediatría">Pediatría</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="badge bg-info text-dark fs-6">
+                        Total: {{ medicos.count }} médico{{ medicos.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla de Médicos -->
+            {% if medicos %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-success">
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre Completo</th>
+                            <th>Especialidad</th>
+                            <th>Registro Médico</th>
+                            <th>Años Experiencia</th>
+                            <th>Turno</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-medicos">
+                        {% for medico in medicos %}
+                        <tr data-nombre="{{ medico.rut_persona.Nombre|lower }} {{ medico.rut_persona.Apellido|lower }}"
+                            data-rut="{{ medico.rut_persona.Rut }}"
+                            data-especialidad="{{ medico.Especialidad }}">
+                            <td><strong>{{ medico.rut_persona.Rut }}</strong></td>
+                            <td>
+                                <i class="bi bi-person-fill text-success"></i>
+                                {{ medico.rut_persona.Nombre }} {{ medico.rut_persona.Apellido }}
+                            </td>
+                            <td>
+                                <span class="badge bg-success">{{ medico.Especialidad }}</span>
+                            </td>
+                            <td>{{ medico.Registro_medico }}</td>
+                            <td>
+                                <i class="bi bi-award"></i> {{ medico.Anos_experiencia }} años
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if medico.Turno == 'Diurno' %}bg-warning text-dark{% endif %}
+                                    {% if medico.Turno == 'Vespertino' %}bg-info{% endif %}
+                                    {% if medico.Turno == 'Nocturno' %}bg-dark{% endif %}
+                                    {% if medico.Turno == 'Rotativo' %}bg-primary{% endif %}">
+                                    {{ medico.Turno }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if medico.rut_persona.Activo %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Activo
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Inactivo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'gestion:detalle_persona' medico.rut_persona.pk %}" 
+                                       class="btn btn-outline-primary" 
+                                       title="Ver Perfil">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'gestion:gestionar_roles' medico.rut_persona.pk %}" 
+                                       class="btn btn-outline-warning" 
+                                       title="Gestionar Roles">
+                                        <i class="bi bi-person-gear"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>No hay médicos registrados.</strong>
+                <br>
+                <a href="{% url 'gestion:registrar_medico' %}" class="btn btn-success btn-sm mt-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Primer Médico
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'gestion:lista_personas' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Personas
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Ir al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Búsqueda y filtros
+document.getElementById('buscar-medico').addEventListener('input', filtrarTabla);
+document.getElementById('filtro-especialidad').addEventListener('change', filtrarTabla);
+
+function filtrarTabla() {
+    const searchTerm = document.getElementById('buscar-medico').value.toLowerCase();
+    const especialidad = document.getElementById('filtro-especialidad').value;
+    const rows = document.querySelectorAll('#tabla-medicos tr');
+    
+    rows.forEach(row => {
+        const nombre = row.dataset.nombre || '';
+        const rut = row.dataset.rut || '';
+        const esp = row.dataset.especialidad || '';
+        
+        const matchSearch = nombre.includes(searchTerm) || rut.includes(searchTerm) || esp.toLowerCase().includes(searchTerm);
+        const matchEsp = !especialidad || esp === especialidad;
+        
+        row.style.display = (matchSearch && matchEsp) ? '' : 'none';
+    });
+}
+
+console.log('✅ Lista de médicos cargada');
+</script>
+{% endblock %}

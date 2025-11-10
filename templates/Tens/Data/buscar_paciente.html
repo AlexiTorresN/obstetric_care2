@@ -1,0 +1,144 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Buscar Paciente - Módulo Tens{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Encabezado -->
+    <div class="text-center mb-4">
+        <h2>
+            <i class="bi bi-search text-warning"></i>
+            Buscar Paciente
+        </h2>
+    </div>
+
+    <!-- Formulario de Búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <i class="bi bi-search"></i> Ingrese RUT o Nombre del Paciente
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{% url 'tens:buscar_paciente' %}">
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input 
+                        type="text" 
+                        class="form-control form-control-lg" 
+                        name="q" 
+                        placeholder="Ej: 18771667-5 o María González"
+                        value="{{ query }}"
+                        autofocus
+                    >
+                    <button class="btn btn-warning btn-lg" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mensaje Informativo -->
+    {% if not query %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            Ingrese el RUT o nombre del paciente para buscar sus fichas
+        </div>
+    {% endif %}
+
+    <!-- Resultados -->
+    {% if query %}
+        {% if pacientes %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-check-circle"></i> Resultados de Búsqueda
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>RUT</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Sexo</th>
+                                    <th class="text-center">Fichas</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paciente in pacientes %}
+                                <tr>
+                                    <td>{{ paciente.persona.Rut }}</td>
+                                    <td>
+                                        <strong>
+                                            {{ paciente.persona.Nombre }} 
+                                            {{ paciente.persona.Apellido_Paterno }} 
+                                            {{ paciente.persona.Apellido_Materno }}
+                                        </strong>
+                                    </td>
+                                    <td>{{ paciente.persona.Sexo }}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">
+                                            {{ paciente.num_fichas }} ficha(s)
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'tens:ver_fichas_paciente' paciente.pk %}" 
+                                            class="btn btn-sm btn-warning">
+                                            <i class="bi bi-folder-open"></i> Ver Fichas
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                No se encontraron pacientes con el criterio: <strong>{{ query }}</strong>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Botón Volver -->
+    <div class="mt-4">
+        <a href="{% url 'tens:menu_tens' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Menú
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control-lg {
+        font-size: 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    .card-header h5 {
+        font-weight: 600;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    .table {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Búsqueda de pacientes TENS cargada');
+</script>
+{% endblock %}

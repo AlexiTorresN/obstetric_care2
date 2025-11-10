@@ -1,0 +1,198 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Detalle de Ingresos - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">
+                <i class="bi bi-clipboard-data"></i> Detalle de Ingresos
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="card mb-4 border-info">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-person-circle"></i> Información del Paciente</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> {{ paciente.persona.Nombre }} {{ paciente.persona.Apellido_Paterno }} {{ paciente.persona.Apellido_Materno }}</p>
+                    <p><strong>RUT:</strong> {{ paciente.persona.Rut }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Edad:</strong> {{ paciente.Edad }} años</p>
+                    <p><strong>Total de Ingresos:</strong> {{ ingresos.count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Ingresos -->
+    {% if ingresos %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-list-ul"></i> Historial de Ingresos ({{ ingresos.count }})
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>N° Ingreso</th>
+                            <th>Fecha Ingreso</th>
+                            <th>Fecha Alta</th>
+                            <th>Ficha Asociada</th>
+                            <th>Motivo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ingreso in ingresos %}
+                        <tr>
+                            <td><strong>#{{ ingreso.pk }}</strong></td>
+                            <td>{{ ingreso.fecha_ingreso|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if ingreso.fecha_alta %}
+                                    {{ ingreso.fecha_alta|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Hospitalizado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ingreso.ficha %}
+                                    <a href="{% url 'matrona:detalle_ficha' ingreso.ficha.pk %}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ficha #{{ ingreso.ficha.pk }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Sin ficha</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ingreso.motivo_ingreso|truncatewords:8 }}</td>
+                            <td>
+                                {% if ingreso.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Finalizado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'matrona:ver_detalle_ingreso' ingreso.pk %}" 
+                                       class="btn btn-sm btn-info"
+                                       title="Ver detalle">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    {% if ingreso.activo %}
+                                    <a href="{% url 'matrona:dar_alta_ingreso' ingreso.pk %}" 
+                                       class="btn btn-sm btn-warning"
+                                       title="Dar de alta">
+                                        <i class="bi bi-box-arrow-right"></i> Alta
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h6 class="text-success">Ingresos Activos</h6>
+                    <h2 class="text-success">
+                        {{ ingresos_activos }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-secondary">
+                <div class="card-body">
+                    <h6 class="text-secondary">Ingresos Finalizados</h6>
+                    <h2 class="text-secondary">
+                        {{ ingresos_finalizados }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <h6 class="text-primary">Total Ingresos</h6>
+                    <h2 class="text-primary">
+                        {{ ingresos.count }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Sin Ingresos -->
+    <div class="alert alert-warning" role="alert">
+        <h5><i class="bi bi-info-circle"></i> Sin Ingresos Registrados</h5>
+        <p>No hay ingresos registrados para este paciente.</p>
+        <hr>
+        <a href="{% url 'matrona:registrar_ingreso' paciente.pk %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Registrar Primer Ingreso
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Botones de Acción -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'matrona:registrar_ingreso' paciente.pk %}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Nuevo Ingreso
+            </a>
+            <a href="{% url 'matrona:lista_fichas_paciente' paciente.pk %}" class="btn btn-primary">
+                <i class="bi bi-folder2-open"></i> Ver Fichas del Paciente
+            </a>
+            <a href="{% url 'matrona:buscar_paciente' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Búsqueda
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn-group .btn {
+        margin: 0 1px;
+    }
+    
+    .card h2 {
+        font-weight: bold;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Detalle de ingresos cargado');
+console.log('Total ingresos: {{ ingresos.count }}');
+</script>
+{% endblock %}

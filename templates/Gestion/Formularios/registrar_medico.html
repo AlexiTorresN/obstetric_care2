@@ -1,0 +1,233 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Registrar Médico - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-clipboard2-pulse"></i> Asignar Rol de Médico
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    {% if persona %}
+                    <!-- Modo: Asignar rol a persona existente -->
+                    <div class="alert alert-light border mb-3">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="mb-1"><strong>RUT:</strong> {{ persona.Rut }}</p>
+                                <p class="mb-1"><strong>Nombre:</strong> {{ persona.Nombre }} {{ persona.Apellido }}</p>
+                                <p class="mb-0"><strong>Sexo:</strong> {{ persona.Sexo }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <span class="badge bg-success fs-6">Asignar Rol Médico</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Modo: Búsqueda de persona -->
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Paso 1:</strong> Busque la persona por RUT para asignar el rol de Médico.
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="buscar-rut" class="form-label">
+                            RUT de la Persona <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg" id="buscar-rut" 
+                                   placeholder="Ej: 12345678-9" autofocus>
+                            <button class="btn btn-primary" type="button" id="btn-buscar">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Ingrese el RUT sin puntos, con guión</small>
+                    </div>
+                    
+                    <div id="persona-info"></div>
+                    <hr>
+                    {% endif %}
+                    
+                    <form method="POST" id="form-medico" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if not persona %}
+                        <!-- Campo oculto para RUT (cuando se busca) -->
+                        <input type="hidden" name="rut_persona" id="rut_persona">
+                        {% endif %}
+                        
+                        <h5 class="text-success border-bottom pb-2 mb-3">
+                            <i class="bi bi-file-medical"></i> Datos Profesionales
+                        </h5>
+                        
+                        <!-- Especialidad -->
+                        <div class="mb-3">
+                            <label for="{{ form.Especialidad.id_for_label }}" class="form-label">
+                                Especialidad <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Especialidad }}
+                            {% if form.Especialidad.errors %}
+                                <div class="text-danger small">{{ form.Especialidad.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Ej: Ginecología, Obstetricia, Medicina General, Pediatría
+                            </small>
+                        </div>
+                        
+                        <!-- Registro Médico -->
+                        <div class="mb-3">
+                            <label for="{{ form.Registro_medico.id_for_label }}" class="form-label">
+                                Número de Registro Médico <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Registro_medico }}
+                            {% if form.Registro_medico.errors %}
+                                <div class="text-danger small">{{ form.Registro_medico.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Registro profesional ante la autoridad competente</small>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Años de Experiencia -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.Anos_experiencia.id_for_label }}" class="form-label">
+                                    Años de Experiencia <span class="text-danger">*</span>
+                                </label>
+                                {{ form.Anos_experiencia }}
+                                {% if form.Anos_experiencia.errors %}
+                                    <div class="text-danger small">{{ form.Anos_experiencia.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Turno -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.Turno.id_for_label }}" class="form-label">
+                                    Turno <span class="text-danger">*</span>
+                                </label>
+                                {{ form.Turno }}
+                                {% if form.Turno.errors %}
+                                    <div class="text-danger small">{{ form.Turno.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-info-circle"></i> Información del Rol Médico
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>El médico tendrá acceso a diagnósticos y prescripciones</li>
+                                <li>Podrá realizar valoraciones obstétricas y de riesgo</li>
+                                <li>Tendrá permisos para firmar documentos médicos</li>
+                                <li>Recibirá notificaciones de casos críticos en su turno</li>
+                            </ul>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if persona %}{% url 'gestion:gestionar_roles' persona.pk %}{% else %}{% url 'gestion:lista_personas' %}{% endif %}" 
+                               class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Guardar Médico
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if not persona %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="bi bi-question-circle"></i> ¿La persona no está registrada?</h6>
+                    <p class="mb-0">
+                        Debe <a href="{% url 'gestion:registrar_persona' %}" target="_blank">registrar los datos básicos de la persona</a> 
+                        antes de asignar el rol de Médico.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not persona %}
+<script src="{% static 'js/buscar_persona.js' %}"></script>
+<script>
+// Búsqueda manual con botón
+document.getElementById('btn-buscar').addEventListener('click', function() {
+    const rut = document.getElementById('buscar-rut').value.trim();
+    
+    if (!rut) {
+        alert('Por favor ingrese un RUT');
+        return;
+    }
+    
+    // Buscar persona
+    fetch(`/gestion/api/persona/buscar/?rut=${encodeURIComponent(rut)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.encontrado) {
+                document.getElementById('persona-info').innerHTML = `
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-check-circle"></i> Persona Encontrada
+                        </h6>
+                        <p class="mb-1"><strong>Nombre:</strong> ${data.persona.nombre_completo}</p>
+                        <p class="mb-1"><strong>RUT:</strong> ${data.persona.rut}</p>
+                        <p class="mb-0"><strong>Sexo:</strong> ${data.persona.sexo}</p>
+                    </div>
+                `;
+                document.getElementById('rut_persona').value = data.persona.rut;
+                
+                // Habilitar formulario
+                document.getElementById('form-medico').style.display = 'block';
+            } else {
+                document.getElementById('persona-info').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>Persona no encontrada</strong>
+                        <p class="mb-0 mt-2">
+                            <a href="/gestion/persona/registrar/" class="btn btn-sm btn-warning">
+                                <i class="bi bi-plus-circle"></i> Registrar Persona Nueva
+                            </a>
+                        </p>
+                    </div>
+                `;
+                document.getElementById('form-medico').style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al buscar persona');
+        });
+});
+
+// Enter en campo RUT
+document.getElementById('buscar-rut').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btn-buscar').click();
+    }
+});
+
+// Ocultar formulario inicialmente
+{% if not persona %}
+document.getElementById('form-medico').style.display = 'none';
+{% endif %}
+</script>
+{% endif %}
+
+<script>
+console.log('✅ Formulario de médico cargado');
+</script>
+{% endblock %}

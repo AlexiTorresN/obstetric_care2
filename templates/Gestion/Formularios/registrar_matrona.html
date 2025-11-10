@@ -1,0 +1,117 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Registrar Matrona - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-heart-pulse"></i> Registrar Matrona
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Importante:</strong> La persona debe estar registrada previamente. 
+                        Ingrese el RUT para buscar y vincular.
+                    </div>
+                    
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- RUT de la Persona -->
+                        <div class="mb-3">
+                            <label for="{{ form.rut_persona.id_for_label }}" class="form-label">
+                                {{ form.rut_persona.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.rut_persona }}
+                            {% if form.rut_persona.errors %}
+                                <div class="text-danger small">{{ form.rut_persona.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">{{ form.rut_persona.help_text }}</small>
+                        </div>
+                        
+                        <!-- Contenedor para información de persona -->
+                        <div id="persona-info"></div>
+                        
+                        <hr>
+                        
+                        <!-- Área de Especialidad -->
+                        <div class="mb-3">
+                            <label for="{{ form.Area_especialidad.id_for_label }}" class="form-label">
+                                Área de Especialidad <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Area_especialidad }}
+                            {% if form.Area_especialidad.errors %}
+                                <div class="text-danger small">{{ form.Area_especialidad.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Registro Profesional -->
+                        <div class="mb-3">
+                            <label for="{{ form.Registro_profesional.id_for_label }}" class="form-label">
+                                Registro Profesional <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Registro_profesional }}
+                            {% if form.Registro_profesional.errors %}
+                                <div class="text-danger small">{{ form.Registro_profesional.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Número de registro en la Superintendencia de Salud</small>
+                        </div>
+                        
+                        <!-- Años de Experiencia -->
+                        <div class="mb-3">
+                            <label for="{{ form.Anos_experiencia.id_for_label }}" class="form-label">
+                                Años de Experiencia <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Anos_experiencia }}
+                            {% if form.Anos_experiencia.errors %}
+                                <div class="text-danger small">{{ form.Anos_experiencia.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Turno -->
+                        <div class="mb-3">
+                            <label for="{{ form.Turno.id_for_label }}" class="form-label">
+                                Turno <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Turno }}
+                            {% if form.Turno.errors %}
+                                <div class="text-danger small">{{ form.Turno.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'home' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-info">
+                                <i class="bi bi-save"></i> Registrar Matrona
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="bi bi-question-circle"></i> ¿La persona no está registrada?</h6>
+                    <p class="mb-0">
+                        Primero debe <a href="{% url 'gestion:registrar_persona' %}" target="_blank">registrar los datos básicos</a> 
+                        antes de asignar el rol de matrona.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/buscar_persona.js' %}"></script>
+{% endblock %}

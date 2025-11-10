@@ -1,0 +1,267 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Registrar Ingreso - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-success">
+                <i class="bi bi-hospital"></i> Registrar Ingreso Hospitalario
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="card mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-person-circle"></i> Datos del Paciente</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>RUT:</strong> {{ paciente.persona.Rut }}</p>
+                    <p><strong>Nombre:</strong> {{ paciente.persona.Nombre }} {{ paciente.persona.Apellido_Paterno }} {{ paciente.persona.Apellido_Materno }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Edad:</strong> {{ paciente.Edad }} años</p>
+                    <p><strong>Fecha Nac:</strong> {{ paciente.persona.Fecha_nacimiento|date:"d/m/Y" }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Teléfono:</strong> {{ paciente.persona.Telefono|default:"No registrado" }}</p>
+                    <p><strong>Email:</strong> {{ paciente.persona.Email|default:"No registrado" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Ingreso -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-clipboard2-plus"></i> Datos del Ingreso</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" id="formRegistrarIngreso">
+                {% csrf_token %}
+                
+                <!-- Mostrar errores -->
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Corrija los siguientes errores:</h5>
+                    {{ form.errors }}
+                </div>
+                {% endif %}
+
+                <!-- Información del Ingreso -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">📝 Detalles del Ingreso</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Fecha y Hora de Ingreso -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_fecha_ingreso" class="form-label">
+                                    Fecha y Hora de Ingreso <span class="text-danger">*</span>
+                                </label>
+                                {{ form.fecha_ingreso }}
+                                <small class="form-text text-muted">Fecha y hora en que el paciente ingresa</small>
+                            </div>
+
+                            <!-- Tipo de Ingreso -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_tipo_ingreso" class="form-label">
+                                    Tipo de Ingreso <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_ingreso }}
+                            </div>
+
+                            <!-- Motivo de Ingreso -->
+                            <div class="col-12 mb-3">
+                                <label for="id_motivo_ingreso" class="form-label">
+                                    Motivo de Ingreso <span class="text-danger">*</span>
+                                </label>
+                                {{ form.motivo_ingreso }}
+                                <small class="form-text text-muted">
+                                    Describa brevemente el motivo principal del ingreso hospitalario
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ficha Asociada -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">📋 Ficha Obstétrica</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Seleccionar Ficha -->
+                            <div class="col-12 mb-3">
+                                <label for="id_ficha" class="form-label">
+                                    Ficha Obstétrica Asociada
+                                </label>
+                                {{ form.ficha }}
+                                <small class="form-text text-muted">
+                                    Seleccione la ficha obstétrica a la que pertenece este ingreso (opcional)
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Botón para crear nueva ficha si no hay ninguna -->
+                        {% if not fichas_disponibles %}
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle"></i> 
+                            Este paciente no tiene fichas obstétricas activas.
+                            <a href="{% url 'matrona:crear_ficha' paciente.pk %}" class="alert-link">
+                                Crear una nueva ficha
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Diagnóstico y Observaciones -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">🩺 Diagnóstico Inicial</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Diagnóstico -->
+                            <div class="col-12 mb-3">
+                                <label for="id_diagnostico_ingreso" class="form-label">
+                                    Diagnóstico de Ingreso
+                                </label>
+                                {{ form.diagnostico_ingreso }}
+                                <small class="form-text text-muted">
+                                    Diagnóstico preliminar al momento del ingreso
+                                </small>
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="col-12 mb-3">
+                                <label for="id_observaciones" class="form-label">
+                                    Observaciones Generales
+                                </label>
+                                {{ form.observaciones }}
+                                <small class="form-text text-muted">
+                                    Cualquier información adicional relevante
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de Emergencia -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">🚨 Información de Urgencia (si aplica)</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Es Emergencia -->
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    {{ form.es_emergencia }}
+                                    <label class="form-check-label" for="id_es_emergencia">
+                                        <strong>Ingreso por Emergencia</strong>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Prioridad -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_prioridad" class="form-label">
+                                    Nivel de Prioridad
+                                </label>
+                                {{ form.prioridad }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> Registrar Ingreso
+                        </button>
+                        <a href="{% url 'matrona:detalle_ingresos' paciente.pk %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="reset" class="btn btn-outline-warning btn-lg">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar Formulario
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Información Importante -->
+    <div class="alert alert-warning mt-4" role="alert">
+        <h6><i class="bi bi-exclamation-triangle"></i> Información Importante</h6>
+        <ul class="mb-0">
+            <li>Registre la fecha y hora exacta del ingreso</li>
+            <li>Asegúrese de seleccionar el tipo de ingreso correcto</li>
+            <li>Si es una emergencia, marque la casilla correspondiente</li>
+            <li>La ficha obstétrica puede asociarse después si es necesario</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Establecer fecha y hora actual por defecto
+document.addEventListener('DOMContentLoaded', function() {
+    const fechaInput = document.getElementById('id_fecha_ingreso');
+    if (fechaInput && !fechaInput.value) {
+        const now = new Date();
+        // Formato: YYYY-MM-DDTHH:MM
+        const formattedDate = now.toISOString().slice(0, 16);
+        fechaInput.value = formattedDate;
+    }
+});
+
+// Resaltar si es emergencia
+document.getElementById('id_es_emergencia')?.addEventListener('change', function() {
+    const card = this.closest('.card');
+    if (this.checked) {
+        card.classList.add('border-danger');
+        card.querySelector('.card-header').classList.add('bg-danger', 'text-white');
+        // Cambiar prioridad a alta automáticamente
+        document.getElementById('id_prioridad').value = 'ALTA';
+    } else {
+        card.classList.remove('border-danger');
+        card.querySelector('.card-header').classList.remove('bg-danger', 'text-white');
+    }
+});
+
+// Validación básica
+document.getElementById('formRegistrarIngreso').addEventListener('submit', function(e) {
+    const fechaIngreso = new Date(document.getElementById('id_fecha_ingreso').value);
+    const ahora = new Date();
+    
+    if (fechaIngreso > ahora) {
+        e.preventDefault();
+        alert('❌ La fecha de ingreso no puede ser futura');
+        return false;
+    }
+    
+    const motivo = document.getElementById('id_motivo_ingreso').value.trim();
+    if (motivo.length < 10) {
+        e.preventDefault();
+        alert('❌ El motivo de ingreso debe tener al menos 10 caracteres');
+        return false;
+    }
+});
+
+console.log('✅ Formulario de registrar ingreso cargado');
+</script>
+{% endblock %}

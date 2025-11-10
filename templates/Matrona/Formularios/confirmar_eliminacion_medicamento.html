@@ -1,0 +1,151 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Eliminación - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Tarjeta de Confirmación PELIGROSA -->
+            <div class="card shadow border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-trash"></i> Confirmar Eliminación Permanente
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mensaje de ADVERTENCIA CRÍTICA -->
+                    <div class="alert alert-danger" role="alert">
+                        <h5><i class="bi bi-exclamation-octagon"></i> ⚠️ ADVERTENCIA CRÍTICA</h5>
+                        <p><strong>¿Está completamente seguro que desea ELIMINAR este medicamento?</strong></p>
+                        <hr>
+                        <p class="mb-0">
+                            Esta acción es <strong>IRREVERSIBLE</strong> y eliminará permanentemente 
+                            el registro del medicamento del sistema.
+                        </p>
+                    </div>
+
+                    <!-- Información del Medicamento a ELIMINAR -->
+                    <div class="card mb-3 border-danger">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-danger">
+                                <i class="bi bi-capsule"></i> Medicamento a Eliminar
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Medicamento:</dt>
+                                <dd class="col-sm-8">
+                                    <strong class="text-danger">
+                                        {{ medicamento.get_nombre_medicamento_display }}
+                                    </strong>
+                                </dd>
+
+                                <dt class="col-sm-4">Dosis:</dt>
+                                <dd class="col-sm-8">{{ medicamento.get_dosis_display }}</dd>
+
+                                <dt class="col-sm-4">Vía:</dt>
+                                <dd class="col-sm-8">{{ medicamento.get_via_administracion_display }}</dd>
+
+                                <dt class="col-sm-4">Frecuencia:</dt>
+                                <dd class="col-sm-8">{{ medicamento.get_frecuencia_display }}</dd>
+
+                                <dt class="col-sm-4">Periodo:</dt>
+                                <dd class="col-sm-8">
+                                    Del {{ medicamento.fecha_inicio|date:"d/m/Y" }} 
+                                    al {{ medicamento.fecha_termino|date:"d/m/Y" }}
+                                </dd>
+
+                                <dt class="col-sm-4">Estado:</dt>
+                                <dd class="col-sm-8">
+                                    {% if medicamento.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </dd>
+
+                                {% if medicamento.observaciones %}
+                                <dt class="col-sm-4">Observaciones:</dt>
+                                <dd class="col-sm-8">{{ medicamento.observaciones }}</dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Información del Paciente -->
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <p class="mb-1">
+                                <strong>Paciente:</strong> 
+                                {{ medicamento.ficha.paciente.persona.Nombre }} 
+                                {{ medicamento.ficha.paciente.persona.Apellido_Paterno }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>RUT:</strong> {{ medicamento.ficha.paciente.persona.Rut }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje Alternativo -->
+                    <div class="alert alert-info" role="alert">
+                        <h6><i class="bi bi-lightbulb"></i> Alternativa Recomendada</h6>
+                        <p class="mb-0">
+                            Si solo necesita detener el tratamiento, considere 
+                            <strong>desactivar</strong> el medicamento en lugar de eliminarlo. 
+                            Esto mantendrá el historial médico completo.
+                        </p>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form method="post" id="formEliminar" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <!-- Checkbox de confirmación -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmarEliminacion" required>
+                            <label class="form-check-label" for="confirmarEliminacion">
+                                <strong>Entiendo que esta acción es irreversible y elimina permanentemente el registro</strong>
+                            </label>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-danger w-100 btn-lg" id="btnEliminar" disabled>
+                                    <i class="bi bi-trash"></i> Eliminar Permanentemente
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{% url 'matrona:detalle_ficha' medicamento.ficha.pk %}" 
+                                    class="btn btn-secondary w-100 btn-lg">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Habilitar botón solo si confirma con checkbox
+document.getElementById('confirmarEliminacion').addEventListener('change', function() {
+    document.getElementById('btnEliminar').disabled = !this.checked;
+});
+
+// Confirmación adicional antes de enviar
+document.getElementById('formEliminar').addEventListener('submit', function(e) {
+    const confirmacion = confirm('⚠️ ÚLTIMA ADVERTENCIA: ¿Realmente desea eliminar este medicamento de forma permanente?');
+    if (!confirmacion) {
+        e.preventDefault();
+    }
+});
+
+console.log('✅ Confirmación de eliminación cargada');
+</script>
+{% endblock %}

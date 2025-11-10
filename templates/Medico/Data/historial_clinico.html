@@ -1,0 +1,167 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Historial Clínico - {{ paciente.persona.Nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Encabezado del Paciente -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-person-fill"></i>
+                Historial Clínico del Paciente
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>RUT:</strong> {{ paciente.persona.Rut }}</p>
+                    <p class="mb-2">
+                        <strong>Nombre:</strong> 
+                        {{ paciente.persona.Nombre }} 
+                        {{ paciente.persona.Apellido_Paterno }} 
+                        {{ paciente.persona.Apellido_Materno }}
+                    </p>
+                    <p class="mb-2"><strong>Edad:</strong> {{ paciente.Edad }} años</p>
+                    <p class="mb-2"><strong>Sexo:</strong> {{ paciente.persona.Sexo }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>Estado Civil:</strong> {{ paciente.get_Estado_civil_display }}</p>
+                    <p class="mb-2"><strong>Previsión:</strong> {{ paciente.get_Previcion_display }}</p>
+                    <p class="mb-2"><strong>Teléfono:</strong> {{ paciente.persona.Telefono|default:"No registrado" }}</p>
+                    <p class="mb-2"><strong>Total de Fichas:</strong> 
+                        <span class="badge bg-primary">{{ total_fichas }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Fichas Obstétricas -->
+    <h3 class="mb-3">
+        <i class="bi bi-file-medical-fill"></i> Fichas Obstétricas
+    </h3>
+
+    {% if fichas %}
+        {% for ficha in fichas %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header {% if ficha.activa %}bg-primary{% else %}bg-secondary{% endif %} text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-medical"></i>
+                        Ficha N° {{ ficha.numero_ficha }}
+                    </h5>
+                    <span class="badge {% if ficha.activa %}bg-light text-dark{% else %}bg-dark{% endif %}">
+                        {% if ficha.activa %}Activa{% else %}Inactiva{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Información General -->
+                    <div class="col-md-6">
+                        <h6 class="text-success"><i class="bi bi-info-circle"></i> Información General</h6>
+                        <p class="mb-1"><strong>Fecha de Creación:</strong> {{ ficha.fecha_creacion|date:"d/m/Y" }}</p>
+                        <p class="mb-1"><strong>Matrona Responsable:</strong> 
+                            {{ ficha.matrona_responsable.persona.Nombre }} 
+                            {{ ficha.matrona_responsable.persona.Apellido_Paterno }}
+                        </p>
+                        <p class="mb-1"><strong>FUM:</strong> {{ ficha.fecha_ultima_menstruacion|date:"d/m/Y" }}</p>
+                        <p class="mb-1"><strong>FPP:</strong> {{ ficha.fecha_probable_parto|date:"d/m/Y" }}</p>
+                        <p class="mb-1"><strong>Edad Gestacional:</strong> {{ ficha.edad_gestacional_actual }} semanas</p>
+                    </div>
+
+                    <!-- Antecedentes -->
+                    <div class="col-md-6">
+                        <h6 class="text-info"><i class="bi bi-clipboard-data"></i> Antecedentes</h6>
+                        <p class="mb-1"><strong>Embarazos Previos:</strong> {{ ficha.embarazos_previos }}</p>
+                        <p class="mb-1"><strong>Partos:</strong> {{ ficha.partos }}</p>
+                        <p class="mb-1"><strong>Cesáreas:</strong> {{ ficha.cesareas }}</p>
+                        <p class="mb-1"><strong>Abortos:</strong> {{ ficha.abortos }}</p>
+                        <p class="mb-1"><strong>Grupo Sanguíneo:</strong> {{ ficha.grupo_sanguineo }}</p>
+                        <p class="mb-1"><strong>Factor RH:</strong> {{ ficha.factor_rh }}</p>
+                    </div>
+                </div>
+
+                <!-- Patologías -->
+                {% if ficha.num_patologias > 0 %}
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Patologías Registradas</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for patologia in ficha.patologias.all %}
+                                <span class="badge bg-danger">
+                                    {{ patologia.nombre }} ({{ patologia.codigo_cie10 }})
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Medicamentos -->
+                {% if ficha.num_medicamentos > 0 %}
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-warning"><i class="bi bi-capsule"></i> Medicamentos Activos</h6>
+                        <span class="badge bg-warning text-dark">
+                            {{ ficha.num_medicamentos }} medicamento(s) activo(s)
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Observaciones -->
+                {% if ficha.observaciones_generales %}
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-secondary"><i class="bi bi-chat-left-text"></i> Observaciones</h6>
+                        <p class="mb-0">{{ ficha.observaciones_generales }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Botón para ver detalle completo -->
+                <hr>
+                <div class="text-end">
+                    <a href="{% url 'matrona:detalle_ficha' ficha.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i> Ver Detalle Completo
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i>
+            Este paciente aún no tiene fichas obstétricas registradas.
+        </div>
+    {% endif %}
+
+    <!-- Botones de navegación -->
+    <div class="mt-4">
+        <a href="{% url 'medico:buscar_paciente' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Búsqueda
+        </a>
+        <a href="{% url 'medico:menu_medico' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-house"></i> Menú Principal
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

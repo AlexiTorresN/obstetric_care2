@@ -1,0 +1,140 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Detalle del Ingreso - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <!-- Encabezado -->
+            <div class="text-center mb-4">
+                <h2>
+                    <i class="bi bi-clipboard2-pulse text-primary"></i>
+                    Detalle del Ingreso Hospitalario
+                </h2>
+                <span class="badge bg-primary fs-5">N° {{ ingreso.numero_ficha }}</span>
+            </div>
+
+            <!-- Información del Paciente -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-badge"></i> Datos del Paciente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- ✅ CORREGIDO: Apellido_Paterno y Apellido_Materno -->
+                            <p class="mb-2">
+                                <strong><i class="bi bi-person"></i> Nombre:</strong> 
+                                {{ ingreso.paciente.persona.Nombre }} 
+                                {{ ingreso.paciente.persona.Apellido_Paterno }} 
+                                {{ ingreso.paciente.persona.Apellido_Materno }}
+                            </p>
+                            <p class="mb-2">
+                                <strong><i class="bi bi-card-text"></i> RUT:</strong> 
+                                {{ ingreso.paciente.persona.Rut }}
+                            </p>
+                            <p class="mb-2">
+                                <strong><i class="bi bi-calendar3"></i> Edad:</strong> 
+                                {{ ingreso.paciente.Edad }} años
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong><i class="bi bi-shield-plus"></i> Previsión:</strong> 
+                                {{ ingreso.paciente.get_Previcion_display }}
+                            </p>
+                            <p class="mb-2">
+                                <strong><i class="bi bi-telephone"></i> Contacto Emergencia:</strong> 
+                                {{ ingreso.paciente.Contacto_emergencia|default:"No registrado" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalles del Ingreso -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard-pulse"></i> Motivo de Consulta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{{ ingreso.motivo_consulta }}</p>
+                </div>
+            </div>
+
+            <!-- Información del Ingreso -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Datos del Ingreso
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-3">
+                                <strong><i class="bi bi-hash"></i> N° Ficha:</strong> 
+                                <span class="badge bg-primary">{{ ingreso.numero_ficha }}</span>
+                            </p>
+                            <p class="mb-3">
+                                <strong><i class="bi bi-calendar-event"></i> Fecha de Ingreso:</strong> 
+                                {{ ingreso.fecha_ingreso|date:"d/m/Y H:i" }}
+                            </p>
+                            <p class="mb-3">
+                                <strong><i class="bi bi-calendar-week"></i> Edad Gestacional:</strong> 
+                                {% if ingreso.edad_gestacional_sem %}
+                                    {{ ingreso.edad_gestacional_sem }} semanas
+                                {% else %}
+                                    <span class="text-muted">No especificada</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-3">
+                                <strong><i class="bi bi-hospital"></i> Derivación:</strong> 
+                                {% if ingreso.derivacion %}
+                                    {{ ingreso.derivacion }}
+                                {% else %}
+                                    <span class="text-muted">No aplica</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Observaciones -->
+                    {% if ingreso.observaciones %}
+                    <hr>
+                    <div class="alert alert-secondary">
+                        <strong><i class="bi bi-chat-left-text"></i> Observaciones:</strong>
+                        <p class="mb-0 mt-2">{{ ingreso.observaciones }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botones de Navegación -->
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'matrona:menu_matrona' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver al Menú
+                </a>
+                <a href="{% url 'matrona:detalle_paciente' ingreso.paciente.pk %}" class="btn btn-primary">
+                    <i class="bi bi-person"></i> Ver Ficha del Paciente
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Detalle de ingreso cargado');
+</script>
+{% endblock %}

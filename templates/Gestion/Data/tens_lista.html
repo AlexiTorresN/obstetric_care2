@@ -1,0 +1,264 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Lista de TENS - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-bandaid-fill"></i> TENS Registrados
+                </h4>
+                <a href="{% url 'gestion:registrar_tens' %}" class="btn btn-dark btn-sm">
+                    <i class="bi bi-plus-circle"></i> Nuevo TENS
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Buscador y Filtros -->
+            <div class="row mb-4">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="buscar-tens" 
+                               placeholder="Buscar por nombre o RUT...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtro-nivel">
+                        <option value="">Todos los niveles</option>
+                        <option value="Básico">Básico</option>
+                        <option value="Medio">Medio</option>
+                        <option value="Superior">Superior</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="filtro-turno">
+                        <option value="">Todos</option>
+                        <option value="Diurno">Diurno</option>
+                        <option value="Vespertino">Vespertino</option>
+                        <option value="Nocturno">Nocturno</option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-end">
+                    <span class="badge bg-info text-dark fs-6">
+                        Total: {{ tens_list.count }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla de TENS -->
+            {% if tens_list %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre Completo</th>
+                            <th>Nivel Certificación</th>
+                            <th>Institución</th>
+                            <th>Años Experiencia</th>
+                            <th>Turno</th>
+                            <th>Certificación</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-tens">
+                        {% for tens in tens_list %}
+                        <tr data-nombre="{{ tens.rut_persona.Nombre|lower }} {{ tens.rut_persona.Apellido|lower }}"
+                            data-rut="{{ tens.rut_persona.Rut }}"
+                            data-nivel="{{ tens.Nivel_certificacion }}"
+                            data-turno="{{ tens.Turno }}">
+                            <td><strong>{{ tens.rut_persona.Rut }}</strong></td>
+                            <td>
+                                <i class="bi bi-person-fill text-warning"></i>
+                                {{ tens.rut_persona.Nombre }} {{ tens.rut_persona.Apellido }}
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if tens.Nivel_certificacion == 'Básico' %}bg-secondary{% endif %}
+                                    {% if tens.Nivel_certificacion == 'Medio' %}bg-info{% endif %}
+                                    {% if tens.Nivel_certificacion == 'Superior' %}bg-success{% endif %}">
+                                    {{ tens.Nivel_certificacion }}
+                                </span>
+                            </td>
+                            <td>{{ tens.Institucion_certificadora }}</td>
+                            <td>
+                                <i class="bi bi-award"></i> {{ tens.Anos_experiencia }} años
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if tens.Turno == 'Diurno' %}bg-warning text-dark{% endif %}
+                                    {% if tens.Turno == 'Vespertino' %}bg-info{% endif %}
+                                    {% if tens.Turno == 'Nocturno' %}bg-dark{% endif %}">
+                                    {{ tens.Turno }}
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ tens.Fecha_certificacion|date:"d/m/Y" }}
+                                </small>
+                            </td>
+                            <td>
+                                {% if tens.rut_persona.Activo %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Activo
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Inactivo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'gestion:detalle_persona' tens.rut_persona.pk %}" 
+                                       class="btn btn-outline-primary" 
+                                       title="Ver Perfil">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'gestion:gestionar_roles' tens.rut_persona.pk %}" 
+                                       class="btn btn-outline-warning" 
+                                       title="Gestionar Roles">
+                                        <i class="bi bi-person-gear"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Estadísticas por Nivel -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h6><i class="bi bi-bar-chart"></i> Distribución por Nivel de Certificación</h6>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-secondary">
+                        <div class="card-body text-center">
+                            <h5 class="text-secondary">{{ stats.basico }}</h5>
+                            <small class="text-muted">Nivel Básico</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <h5 class="text-info">{{ stats.medio }}</h5>
+                            <small class="text-muted">Nivel Medio</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <h5 class="text-success">{{ stats.superior }}</h5>
+                            <small class="text-muted">Nivel Superior</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribución por Turno -->
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <h6><i class="bi bi-clock"></i> Distribución por Turno</h6>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-warning">
+                        <div class="card-body text-center">
+                            <h5 class="text-warning">{{ stats.diurno }}</h5>
+                            <small class="text-muted">Diurno</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <h5 class="text-info">{{ stats.vespertino }}</h5>
+                            <small class="text-muted">Vespertino</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-dark">
+                        <div class="card-body text-center">
+                            <h5 class="text-dark">{{ stats.nocturno }}</h5>
+                            <small class="text-muted">Nocturno</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h5 class="text-primary">{{ stats.total }}</h5>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>No hay TENS registrados.</strong>
+                <br>
+                <a href="{% url 'gestion:registrar_tens' %}" class="btn btn-warning btn-sm mt-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Primer TENS
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'gestion:lista_personas' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Personas
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Ir al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Búsqueda y filtros
+document.getElementById('buscar-tens').addEventListener('input', filtrarTabla);
+document.getElementById('filtro-nivel').addEventListener('change', filtrarTabla);
+document.getElementById('filtro-turno').addEventListener('change', filtrarTabla);
+
+function filtrarTabla() {
+    const searchTerm = document.getElementById('buscar-tens').value.toLowerCase();
+    const nivel = document.getElementById('filtro-nivel').value;
+    const turno = document.getElementById('filtro-turno').value;
+    const rows = document.querySelectorAll('#tabla-tens tr');
+    
+    rows.forEach(row => {
+        const nombre = row.dataset.nombre || '';
+        const rut = row.dataset.rut || '';
+        const niv = row.dataset.nivel || '';
+        const tur = row.dataset.turno || '';
+        
+        const matchSearch = nombre.includes(searchTerm) || rut.includes(searchTerm);
+        const matchNivel = !nivel || niv === nivel;
+        const matchTurno = !turno || tur === turno;
+        
+        row.style.display = (matchSearch && matchNivel && matchTurno) ? '' : 'none';
+    });
+}
+
+console.log('✅ Lista de TENS cargada:', {{ tens_list.count }});
+</script>
+{% endblock %}

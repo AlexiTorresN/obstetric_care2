@@ -1,0 +1,148 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Módulo Médico - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Encabezado -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">
+            <i class="bi bi-clipboard2-pulse text-primary"></i>
+            Módulo Médico
+        </h1>
+        <p class="lead text-muted">
+            Gestión del Catálogo de Patologías Obstétricas
+        </p>
+    </div>
+
+    <!-- Tarjetas de Acceso Rápido -->
+    <div class="row g-4">
+        
+        <!-- CATÁLOGO DE PATOLOGÍAS -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-medical"></i> Catálogo de Patologías
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Consultar, registrar y gestionar el catálogo completo de patologías obstétricas del sistema.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'medico:listar_patologias' %}" class="btn btn-primary">
+                            <i class="bi bi-journal-medical"></i> Ver Catálogo Completo
+                        </a>
+                        <a href="{% url 'medico:registrar_patologia' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle"></i> Registrar Nueva Patología
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORIAL CLÍNICO -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-medical-fill"></i> Historial Clínico
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Consultar el historial clínico completo de pacientes, incluyendo fichas obstétricas, patologías y medicamentos.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'medico:buscar_paciente' %}" class="btn btn-success">
+                            <i class="bi bi-search"></i> Buscar Paciente
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas del Catálogo -->
+    <div class="card shadow-sm mt-5">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-graph-up"></i> Estadísticas del Catálogo
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <i class="bi bi-file-medical-fill text-primary" style="font-size: 3rem;"></i>
+                        <h3 class="mt-2">{{ total_patologias|default:"0" }}</h3>
+                        <p class="text-muted">Total Patologías</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-2">{{ patologias_activas|default:"0" }}</h3>
+                        <p class="text-muted">Activas</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <i class="bi bi-x-circle-fill text-secondary" style="font-size: 3rem;"></i>
+                        <h3 class="mt-2">{{ patologias_inactivas|default:"0" }}</h3>
+                        <p class="text-muted">Inactivas</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+                        <h3 class="mt-2">{{ patologias_alto_riesgo|default:"0" }}</h3>
+                        <p class="text-muted">Alto Riesgo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acerca del CIE-10 -->
+    <div class="alert alert-info mt-4">
+        <h5 class="alert-heading">
+            <i class="bi bi-info-circle"></i> Acerca del CIE-10
+        </h5>
+        <p class="mb-0">
+            <strong>CIE-10 (Clasificación Internacional de Enfermedades)</strong> es el estándar internacional para el registro de enfermedades y problemas de salud.
+            <br>
+            Los códigos <strong>O00-O99</strong> corresponden a embarazo, parto y puerperio. Este sistema permite estandarizar el registro de patologías obstétricas en el sistema.
+        </p>
+    </div>
+
+    <!-- Botón Volver -->
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Módulo Médico cargado correctamente');
+</script>
+{% endblock %}

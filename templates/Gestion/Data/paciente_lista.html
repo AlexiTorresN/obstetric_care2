@@ -1,0 +1,217 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Pacientes - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-person-hearts"></i> Pacientes Registradas
+                </h4>
+                <a href="{% url 'gestion:asignar_rol_paciente' %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Nueva Paciente
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Buscador y Filtros -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="buscar-paciente" 
+                               placeholder="Buscar por nombre o RUT...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtro-estado">
+                        <option value="">Todas</option>
+                        <option value="activa">Activas</option>
+                        <option value="inactiva">Inactivas</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="badge bg-info text-dark fs-6">
+                        Total: {{ pacientes.count }} paciente{{ pacientes.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla de Pacientes -->
+            {% if pacientes %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre Completo</th>
+                            <th>Edad</th>
+                            <th>Acompañante</th>
+                            <th>Contacto Emergencia</th>
+                            <th>Fichas Activas</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-pacientes">
+                        {% for paciente in pacientes %}
+                        <tr data-nombre="{{ paciente.rut_persona.Nombre|lower }} {{ paciente.rut_persona.Apellido|lower }}"
+                            data-rut="{{ paciente.rut_persona.Rut }}"
+                            data-estado="{% if paciente.rut_persona.Activo %}activa{% else %}inactiva{% endif %}">
+                            <td><strong>{{ paciente.rut_persona.Rut }}</strong></td>
+                            <td>
+                                <i class="bi bi-person-fill text-danger"></i>
+                                {{ paciente.rut_persona.Nombre }} {{ paciente.rut_persona.Apellido }}
+                            </td>
+                            <td>
+                                {{ paciente.Edad }} años
+                            </td>
+                            <td>{{ paciente.Acompanante|default:"Sin registrar" }}</td>
+                            <td>
+                                <i class="bi bi-telephone"></i> {{ paciente.Contacto_emergencia|default:"Sin registrar" }}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ paciente.fichas_activas|default:0 }} ficha{{ paciente.fichas_activas|pluralize }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if paciente.rut_persona.Activo %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Activa
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Inactiva
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'gestion:detalle_persona' paciente.rut_persona.pk %}" 
+                                       class="btn btn-outline-primary" 
+                                       title="Ver Perfil">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'matrona:fichas_paciente' paciente.pk %}" 
+                                       class="btn btn-outline-info" 
+                                       title="Ver Fichas">
+                                        <i class="bi bi-file-medical"></i>
+                                    </a>
+                                    <a href="{% url 'gestion:gestionar_roles' paciente.rut_persona.pk %}" 
+                                       class="btn btn-outline-warning" 
+                                       title="Gestionar Roles">
+                                        <i class="bi bi-person-gear"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card border-danger">
+                        <div class="card-body text-center">
+                            <h5 class="text-danger">{{ pacientes.count }}</h5>
+                            <small class="text-muted">Total Pacientes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <h5 class="text-success">{{ pacientes_activas }}</h5>
+                            <small class="text-muted">Activas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h5 class="text-primary">{{ fichas_totales }}</h5>
+                            <small class="text-muted">Fichas Totales</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-warning">
+                        <div class="card-body text-center">
+                            <h5 class="text-warning">{{ controles_pendientes }}</h5>
+                            <small class="text-muted">Controles Pendientes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>No hay pacientes registradas.</strong>
+                <br>
+                <a href="{% url 'gestion:asignar_rol_paciente' %}" class="btn btn-danger btn-sm mt-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Primera Paciente
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'gestion:lista_personas' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Personas
+                </a>
+                <div class="btn-group">
+                    <button class="btn btn-outline-info" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                    <button class="btn btn-outline-success" onclick="exportarExcel()">
+                        <i class="bi bi-file-excel"></i> Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Búsqueda y filtros
+document.getElementById('buscar-paciente').addEventListener('input', filtrarTabla);
+document.getElementById('filtro-estado').addEventListener('change', filtrarTabla);
+
+function filtrarTabla() {
+    const searchTerm = document.getElementById('buscar-paciente').value.toLowerCase();
+    const estado = document.getElementById('filtro-estado').value;
+    const rows = document.querySelectorAll('#tabla-pacientes tr');
+    
+    rows.forEach(row => {
+        const nombre = row.dataset.nombre || '';
+        const rut = row.dataset.rut || '';
+        const est = row.dataset.estado || '';
+        
+        const matchSearch = nombre.includes(searchTerm) || rut.includes(searchTerm);
+        const matchEstado = !estado || est === estado;
+        
+        row.style.display = (matchSearch && matchEstado) ? '' : 'none';
+    });
+}
+
+function exportarExcel() {
+    alert('Función de exportación en desarrollo');
+    // Implementar exportación a Excel
+}
+
+console.log('✅ Lista de pacientes cargada:', {{ pacientes.count }});
+</script>
+{% endblock %}

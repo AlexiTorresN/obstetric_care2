@@ -1,0 +1,214 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Cambiar Estado - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Tarjeta de Confirmación -->
+            <div class="card shadow {% if objeto.activo %}border-warning{% else %}border-success{% endif %}">
+                <div class="card-header {% if objeto.activo %}bg-warning{% else %}bg-success text-white{% endif %}">
+                    <h4 class="mb-0">
+                        <i class="bi {% if objeto.activo %}bi-pause-circle{% else %}bi-play-circle{% endif %}"></i> 
+                        {% if objeto.activo %}
+                            Desactivar
+                        {% else %}
+                            Activar
+                        {% endif %}
+                        {{ tipo_objeto|title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mensaje de Confirmación -->
+                    <div class="alert {% if objeto.activo %}alert-warning{% else %}alert-success{% endif %}" role="alert">
+                        <h5>
+                            <i class="bi bi-question-circle"></i> 
+                            ¿Está seguro que desea 
+                            {% if objeto.activo %}
+                                <strong>desactivar</strong>
+                            {% else %}
+                                <strong>activar</strong>
+                            {% endif %}
+                            este {{ tipo_objeto }}?
+                        </h5>
+                        <hr>
+                        <p class="mb-0">
+                            {% if objeto.activo %}
+                                Al desactivar, este {{ tipo_objeto }} no estará disponible en el sistema
+                                pero se mantendrá en el registro.
+                            {% else %}
+                                Al activar, este {{ tipo_objeto }} volverá a estar disponible en el sistema.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Información del Objeto -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="bi bi-info-circle"></i> 
+                                Información del {{ tipo_objeto|title }}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <!-- ID -->
+                                <dt class="col-sm-4">ID:</dt>
+                                <dd class="col-sm-8"><strong>#{{ objeto.pk }}</strong></dd>
+
+                                <!-- Nombre/Título del Objeto -->
+                                {% if objeto.nombre %}
+                                <dt class="col-sm-4">Nombre:</dt>
+                                <dd class="col-sm-8">{{ objeto.nombre }}</dd>
+                                {% endif %}
+
+                                <!-- Estado Actual -->
+                                <dt class="col-sm-4">Estado Actual:</dt>
+                                <dd class="col-sm-8">
+                                    {% if objeto.activo %}
+                                        <span class="badge bg-success">ACTIVO</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">INACTIVO</span>
+                                    {% endif %}
+                                </dd>
+
+                                <!-- Estado Nuevo -->
+                                <dt class="col-sm-4">Estado Nuevo:</dt>
+                                <dd class="col-sm-8">
+                                    {% if not objeto.activo %}
+                                        <span class="badge bg-success">ACTIVO</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">INACTIVO</span>
+                                    {% endif %}
+                                </dd>
+
+                                <!-- Información Adicional según Tipo -->
+                                {% if tipo_objeto == 'patología' %}
+                                    {% if objeto.codigo_cie10 %}
+                                    <dt class="col-sm-4">Código CIE-10:</dt>
+                                    <dd class="col-sm-8"><code>{{ objeto.codigo_cie10 }}</code></dd>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if tipo_objeto == 'medicamento' %}
+                                    {% if objeto.dosis %}
+                                    <dt class="col-sm-4">Dosis:</dt>
+                                    <dd class="col-sm-8">{{ objeto.get_dosis_display }}</dd>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if tipo_objeto == 'paciente' %}
+                                    {% if objeto.persona %}
+                                    <dt class="col-sm-4">RUT:</dt>
+                                    <dd class="col-sm-8">{{ objeto.persona.Rut }}</dd>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if tipo_objeto == 'ficha' %}
+                                    {% if objeto.paciente %}
+                                    <dt class="col-sm-4">Paciente:</dt>
+                                    <dd class="col-sm-8">
+                                        {{ objeto.paciente.persona.Nombre }} 
+                                        {{ objeto.paciente.persona.Apellido_Paterno }}
+                                    </dd>
+                                    {% endif %}
+                                {% endif %}
+
+                                <!-- Fecha de Creación -->
+                                {% if objeto.fecha_creacion %}
+                                <dt class="col-sm-4">Creado:</dt>
+                                <dd class="col-sm-8">{{ objeto.fecha_creacion|date:"d/m/Y H:i" }}</dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Advertencias Específicas -->
+                    {% if objeto.activo %}
+                    <div class="alert alert-info" role="alert">
+                        <h6><i class="bi bi-lightbulb"></i> Consideraciones</h6>
+                        <ul class="mb-0">
+                            <li>El {{ tipo_objeto }} seguirá existiendo en la base de datos</li>
+                            <li>No aparecerá en las listas activas del sistema</li>
+                            <li>Los registros históricos asociados no se verán afectados</li>
+                            <li>Puede reactivarlo en cualquier momento</li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success" role="alert">
+                        <h6><i class="bi bi-check-circle"></i> Al Activar</h6>
+                        <ul class="mb-0">
+                            <li>El {{ tipo_objeto }} volverá a estar disponible</li>
+                            <li>Aparecerá en las listas y formularios del sistema</li>
+                            <li>Podrá ser utilizado normalmente</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulario de Confirmación -->
+                    <form method="post" id="formToggleEstado">
+                        {% csrf_token %}
+                        
+                        <!-- Campo oculto con la acción -->
+                        <input type="hidden" name="accion" value="{% if objeto.activo %}desactivar{% else %}activar{% endif %}">
+
+                        <div class="row g-2 mt-3">
+                            <div class="col-md-6">
+                                <button type="submit" 
+                                        class="btn {% if objeto.activo %}btn-warning{% else %}btn-success{% endif %} w-100 btn-lg">
+                                    <i class="bi {% if objeto.activo %}bi-pause-circle{% else %}bi-play-circle{% endif %}"></i> 
+                                    Sí, {% if objeto.activo %}Desactivar{% else %}Activar{% endif %}
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{{ url_volver }}" class="btn btn-secondary w-100 btn-lg">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información de Auditoría (si existe) -->
+            {% if objeto.fecha_actualizacion %}
+            <div class="alert alert-secondary mt-4" role="alert">
+                <small>
+                    <i class="bi bi-clock-history"></i> 
+                    <strong>Última actualización:</strong> 
+                    {{ objeto.fecha_actualizacion|date:"d/m/Y H:i" }}
+                    {% if objeto.usuario_actualizacion %}
+                        por {{ objeto.usuario_actualizacion }}
+                    {% endif %}
+                </small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Confirmación adicional antes de enviar
+document.getElementById('formToggleEstado')?.addEventListener('submit', function(e) {
+    const accion = document.querySelector('input[name="accion"]').value;
+    const tipoObjeto = '{{ tipo_objeto }}';
+    
+    const mensaje = accion === 'desactivar' 
+        ? `⚠️ ¿Confirma que desea DESACTIVAR este ${tipoObjeto}?`
+        : `✅ ¿Confirma que desea ACTIVAR este ${tipoObjeto}?`;
+    
+    const confirmacion = confirm(mensaje);
+    if (!confirmacion) {
+        e.preventDefault();
+    }
+});
+
+console.log('✅ Toggle de estado cargado');
+console.log('Estado actual: {{ objeto.activo }}');
+console.log('Tipo de objeto: {{ tipo_objeto }}');
+</script>
+{% endblock %}

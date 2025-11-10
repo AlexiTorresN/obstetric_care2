@@ -1,0 +1,154 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Personas - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-people-fill"></i> Gestión de Personas
+                </h4>
+                <a href="{% url 'gestion:registrar_persona' %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Nueva Persona
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Buscador -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="buscar-persona" 
+                               placeholder="Buscar por RUT, nombre o apellido...">
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="badge bg-info text-dark fs-6">
+                        Total: {{ personas.count }} persona{{ personas.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla de Personas -->
+            {% if personas %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre Completo</th>
+                            <th>Sexo</th>
+                            <th>Fecha Nacimiento</th>
+                            <th>Contacto</th>
+                            <th>Roles</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-personas">
+                        {% for persona in personas %}
+                        <tr data-rut="{{ persona.Rut }}" 
+                            data-nombre="{{ persona.Nombre|lower }} {{ persona.Apellido|lower }}">
+                            <td><strong>{{ persona.Rut }}</strong></td>
+                            <td>{{ persona.Nombre }} {{ persona.Apellido }}</td>
+                            <td>
+                                {% if persona.Sexo == 'Masculino' %}
+                                    <i class="bi bi-gender-male text-primary"></i>
+                                {% else %}
+                                    <i class="bi bi-gender-female text-danger"></i>
+                                {% endif %}
+                                {{ persona.Sexo }}
+                            </td>
+                            <td>{{ persona.Fecha_nacimiento|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if persona.Telefono %}
+                                    <i class="bi bi-telephone"></i> {{ persona.Telefono }}<br>
+                                {% endif %}
+                                {% if persona.Email %}
+                                    <i class="bi bi-envelope"></i> {{ persona.Email }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% if persona.paciente %}
+                                        <span class="badge bg-danger">Paciente</span>
+                                    {% endif %}
+                                    {% if persona.medico %}
+                                        <span class="badge bg-success">Médico</span>
+                                    {% endif %}
+                                    {% if persona.matrona %}
+                                        <span class="badge bg-info">Matrona</span>
+                                    {% endif %}
+                                    {% if persona.tens %}
+                                        <span class="badge bg-warning text-dark">TENS</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'gestion:detalle_persona' persona.pk %}" 
+                                       class="btn btn-outline-primary" 
+                                       title="Ver Detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'gestion:gestionar_roles' persona.pk %}" 
+                                       class="btn btn-outline-warning" 
+                                       title="Gestionar Roles">
+                                        <i class="bi bi-person-gear"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>No hay personas registradas.</strong>
+                <br>
+                <a href="{% url 'gestion:registrar_persona' %}" class="btn btn-primary btn-sm mt-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Primera Persona
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer">
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al Inicio
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Búsqueda en tiempo real
+document.getElementById('buscar-persona').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#tabla-personas tr');
+    
+    rows.forEach(row => {
+        const rut = row.dataset.rut.toLowerCase();
+        const nombre = row.dataset.nombre.toLowerCase();
+        
+        if (rut.includes(searchTerm) || nombre.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+console.log('✅ Lista de personas cargada');
+</script>
+{% endblock %}

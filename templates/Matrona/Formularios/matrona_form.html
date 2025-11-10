@@ -1,0 +1,291 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Formulario de Matrona - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado Dinámico -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">
+                <i class="bi bi-person-badge"></i> 
+                {% if form.instance.pk %}
+                    Editar Matrona
+                {% else %}
+                    Registrar Nueva Matrona
+                {% endif %}
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Formulario de Matrona -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-person-lines-fill"></i> 
+                Datos de la Matrona
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" id="formMatrona" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Mostrar errores generales -->
+                {% if form.errors or form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Errores en el formulario:</h5>
+                    {% if form.non_field_errors %}
+                        {{ form.non_field_errors }}
+                    {% endif %}
+                    {{ form.errors }}
+                </div>
+                {% endif %}
+
+                <!-- Datos Personales -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">👤 Información Personal</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- RUT -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_rut" class="form-label">
+                                    RUT <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Rut }}
+                                <small class="form-text text-muted">Ej: 12345678-9</small>
+                            </div>
+
+                            <!-- Nombres -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_nombre" class="form-label">
+                                    Nombres <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Nombre }}
+                            </div>
+
+                            <!-- Apellido Paterno -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_apellido_paterno" class="form-label">
+                                    Apellido Paterno <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Apellido_Paterno }}
+                            </div>
+
+                            <!-- Apellido Materno -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_apellido_materno" class="form-label">
+                                    Apellido Materno <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Apellido_Materno }}
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_fecha_nacimiento" class="form-label">
+                                    Fecha de Nacimiento <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Fecha_nacimiento }}
+                            </div>
+
+                            <!-- Sexo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_sexo" class="form-label">
+                                    Sexo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Sexo }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de Contacto -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">📞 Información de Contacto</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Teléfono -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_telefono" class="form-label">
+                                    Teléfono <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Telefono }}
+                                <small class="form-text text-muted">Ej: +56912345678</small>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_email" class="form-label">
+                                    Email <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Email }}
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="col-md-12 mb-3">
+                                <label for="id_direccion" class="form-label">
+                                    Dirección <span class="text-danger">*</span>
+                                </label>
+                                {{ form.persona.Direccion }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos Profesionales -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">🏥 Información Profesional</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Número de Registro -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_numero_registro" class="form-label">
+                                    N° de Registro Profesional <span class="text-danger">*</span>
+                                </label>
+                                {{ form.numero_registro }}
+                                <small class="form-text text-muted">Número de registro de matrona</small>
+                            </div>
+
+                            <!-- Especialidad (si aplica) -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_especialidad" class="form-label">
+                                    Especialidad
+                                </label>
+                                {{ form.especialidad }}
+                            </div>
+
+                            <!-- Años de Experiencia -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_anos_experiencia" class="form-label">
+                                    Años de Experiencia
+                                </label>
+                                {{ form.anos_experiencia }}
+                            </div>
+
+                            <!-- Estado (solo para edición) -->
+                            {% if form.instance.pk %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <div class="form-check form-switch">
+                                    {{ form.activo }}
+                                    <label class="form-check-label" for="id_activo">
+                                        Matrona Activa
+                                    </label>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Foto (opcional) -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">📷 Foto de Perfil (Opcional)</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if form.instance.pk and form.instance.persona.foto %}
+                        <div class="mb-3">
+                            <img src="{{ form.instance.persona.foto.url }}" 
+                                 alt="Foto actual" 
+                                 class="img-thumbnail" 
+                                 style="max-width: 200px;">
+                        </div>
+                        {% endif %}
+                        {{ form.persona.foto }}
+                        <small class="form-text text-muted">Formatos permitidos: JPG, PNG (máx. 5MB)</small>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> 
+                            {% if form.instance.pk %}
+                                Guardar Cambios
+                            {% else %}
+                                Registrar Matrona
+                            {% endif %}
+                        </button>
+                        <a href="{% url 'gestion:listar_matronas' %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        {% if not form.instance.pk %}
+                        <button type="reset" class="btn btn-outline-warning btn-lg">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Información Adicional -->
+    <div class="alert alert-info mt-4" role="alert">
+        <h6><i class="bi bi-info-circle"></i> Información Importante</h6>
+        <ul class="mb-0">
+            <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+            <li>El RUT debe ser válido y único en el sistema</li>
+            <li>El número de registro profesional debe ser válido</li>
+            <li>El email se utilizará para notificaciones del sistema</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación básica de RUT chileno
+function validarRut(rut) {
+    rut = rut.replace(/\./g, '').replace(/-/g, '');
+    
+    if (rut.length < 2) return false;
+    
+    const cuerpo = rut.slice(0, -1);
+    const dv = rut.slice(-1).toUpperCase();
+    
+    let suma = 0;
+    let multiplo = 2;
+    
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+        suma += parseInt(cuerpo.charAt(i)) * multiplo;
+        multiplo = multiplo === 7 ? 2 : multiplo + 1;
+    }
+    
+    const dvEsperado = 11 - (suma % 11);
+    const dvCalculado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+    
+    return dv === dvCalculado;
+}
+
+// Validar RUT al enviar formulario
+document.getElementById('formMatrona')?.addEventListener('submit', function(e) {
+    const rutInput = document.getElementById('id_rut');
+    if (rutInput && !validarRut(rutInput.value)) {
+        e.preventDefault();
+        alert('❌ El RUT ingresado no es válido. Por favor verifique.');
+        rutInput.focus();
+        return false;
+    }
+});
+
+// Validar email
+document.getElementById('id_email')?.addEventListener('blur', function() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (this.value && !emailRegex.test(this.value)) {
+        alert('⚠️ Por favor ingrese un email válido');
+    }
+});
+
+console.log('✅ Formulario de matrona cargado');
+</script>
+{% endblock %}

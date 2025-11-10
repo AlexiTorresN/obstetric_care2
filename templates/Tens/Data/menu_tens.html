@@ -1,0 +1,145 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Módulo Tens - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Encabezado -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">
+            <i class="bi bi-person-badge text-warning"></i>
+            Módulo de Tens
+        </h1>
+        <p class="lead text-muted">
+            Sistema de Administración de Medicamentos y Signos Vitales
+        </p>
+    </div>
+
+    <!-- Tarjetas de Acceso Rápido -->
+    <div class="row g-4">
+        
+        <!-- BÚSQUEDA DE PACIENTES -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-search"></i> Búsqueda de Pacientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Buscar paciente por RUT o nombre para ver sus fichas y administrar medicamentos.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'tens:buscar_paciente' %}" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Buscar Paciente
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGISTRO DE SIGNOS VITALES -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard2-pulse"></i> Signos Vitales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Registrar los signos vitales de los pacientes (presión, temperatura, frecuencia cardíaca).
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'tens:parametros_tens' %}" class="btn btn-success">
+                            <i class="bi bi-clipboard2-pulse"></i> Registrar Signos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card text-center bg-light shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-people-fill text-primary" style="font-size: 2.5rem;"></i>
+                    <h4 class="mt-2">{{ total_pacientes|default:"0" }}</h4>
+                    <p class="text-muted mb-0">Pacientes Activos</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-center bg-light shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-file-medical text-success" style="font-size: 2.5rem;"></i>
+                    <h4 class="mt-2">{{ total_fichas_activas|default:"0" }}</h4>
+                    <p class="text-muted mb-0">Fichas Activas</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-center bg-light shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-capsule text-warning" style="font-size: 2.5rem;"></i>
+                    <h4 class="mt-2">{{ administraciones_hoy|default:"0" }}</h4>
+                    <p class="text-muted mb-0">Administraciones Hoy</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información -->
+    <div class="alert alert-info mt-5">
+        <h5 class="alert-heading">
+            <i class="bi bi-info-circle"></i> Instrucciones de Uso
+        </h5>
+        <ol class="mb-0">
+            <li>Busque el paciente por RUT o nombre</li>
+            <li>Seleccione la ficha obstétrica activa</li>
+            <li>Vea los medicamentos asignados por la matrona</li>
+            <li>Registre la administración de cada medicamento con la hora exacta</li>
+            <li>Registre los signos vitales del paciente según corresponda</li>
+        </ol>
+    </div>
+
+    <!-- Botón Volver -->
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Módulo TENS cargado correctamente');
+console.log('📊 Estadísticas:', {
+    pacientes: {{ total_pacientes|default:0 }},
+    fichas: {{ total_fichas_activas|default:0 }},
+    administraciones: {{ administraciones_hoy|default:0 }}
+});
+</script>
+{% endblock %}

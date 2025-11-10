@@ -1,0 +1,144 @@
+{% extends 'Shared/base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-notes-medical"></i> {{ titulo }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Nombre de la Patología -->
+                        <div class="mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                <i class="fas fa-hospital-user"></i> {{ form.nombre.label }} 
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.nombre.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">
+                                Ejemplo: Diabetes Gestacional, Hipertensión en el embarazo
+                            </small>
+                        </div>
+
+                        <!-- Código CIE-10 -->
+                        <div class="mb-3">
+                            <label for="{{ form.codigo_cie_10.id_for_label }}" class="form-label">
+                                <i class="fas fa-barcode"></i> {{ form.codigo_cie_10.label }} 
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.codigo_cie_10 }}
+                            {% if form.codigo_cie_10.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.codigo_cie_10.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">
+                                Clasificación Internacional de Enfermedades (OMS)
+                            </small>
+                        </div>
+
+                        <!-- Nivel de Riesgo -->
+                        <div class="mb-3">
+                            <label for="{{ form.nivel_de_riesgo.id_for_label }}" class="form-label">
+                                <i class="fas fa-exclamation-triangle"></i> {{ form.nivel_de_riesgo.label }} 
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.nivel_de_riesgo }}
+                            {% if form.nivel_de_riesgo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.nivel_de_riesgo.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">
+                                Nivel de riesgo para la salud de la gestante
+                            </small>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                <i class="fas fa-align-left"></i> {{ form.descripcion.label }}
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.descripcion.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">
+                                Descripción breve de la patología (opcional)
+                            </small>
+                        </div>
+
+                        <!-- Protocolo de Seguimiento -->
+                        <div class="mb-3">
+                            <label for="{{ form.protocolo_seguimiento.id_for_label }}" class="form-label">
+                                <i class="fas fa-clipboard-list"></i> {{ form.protocolo_seguimiento.label }}
+                            </label>
+                            {{ form.protocolo_seguimiento }}
+                            {% if form.protocolo_seguimiento.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.protocolo_seguimiento.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">
+                                Indicaciones médicas y protocolo de seguimiento (opcional)
+                            </small>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="mb-3">
+                            <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                <i class="fas fa-toggle-on"></i> {{ form.estado.label }}
+                            </label>
+                            {{ form.estado }}
+                            {% if form.estado.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.estado.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> {{ accion }}
+                            </button>
+                            <a href="{% url 'medico:listar_patologias' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver al listado
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Buscar Paciente - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-search"></i> Buscar Paciente
+            </h4>
+        </div>
+        <div class="card-body">
+            <!-- Formulario de búsqueda -->
+            <form method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" 
+                        name="q" 
+                        class="form-control" 
+                        placeholder="Buscar por RUT o nombre..."
+                        value="{{ query }}"
+                        autofocus>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+                <small class="form-text text-muted">
+                    Ingrese el RUT (ej: 12345678-9) o el nombre del paciente
+                </small>
+            </form>
+            
+            <!-- Resultados -->
+            {% if query %}
+                {% if pacientes %}
+                    <h5 class="mb-3">Resultados de búsqueda ({{ pacientes.count }} encontrados)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>RUT</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Edad</th>
+                                    <th>Estado Civil</th>
+                                    <th>Previsión</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paciente in pacientes %}
+                                <tr>
+                                    <td><strong>{{ paciente.persona.Rut }}</strong></td>
+                                    <!-- ✅ CORREGIDO: Apellido_Paterno y Apellido_Materno -->
+                                    <td>
+                                        {{ paciente.persona.Nombre }} 
+                                        {{ paciente.persona.Apellido_Paterno }} 
+                                        {{ paciente.persona.Apellido_Materno }}
+                                    </td>
+                                    <td>{{ paciente.Edad }} años</td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            {{ paciente.get_Estado_civil_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ paciente.get_Previcion_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'matrona:detalle_paciente' paciente.pk %}" 
+                                           class="btn btn-sm btn-primary" 
+                                           title="Ver detalle">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>No se encontraron pacientes</strong> con el término: <em>"{{ query }}"</em>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Ingrese un término de búsqueda para comenzar
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'matrona:menu_matrona' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Vista de búsqueda de pacientes cargada');
+</script>
+{% endblock %}

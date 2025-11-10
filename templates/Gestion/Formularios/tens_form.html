@@ -1,0 +1,195 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Formulario TENS - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="bi bi-bandaid-fill"></i> Formulario TENS
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    {% if persona %}
+                    <!-- Modo: Asignar rol a persona existente -->
+                    <div class="alert alert-light border mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>RUT:</strong> {{ persona.Rut }}</p>
+                                <p class="mb-0"><strong>Nombre:</strong> {{ persona.Nombre }} {{ persona.Apellido }}</p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <span class="badge bg-warning text-dark">Asignar Rol TENS</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Modo: Búsqueda de persona -->
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Paso 1:</strong> Busque la persona por RUT para asignar el rol de TENS.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="buscar-rut" class="form-label">
+                            RUT de la Persona <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="buscar-rut" 
+                                   placeholder="Ej: 12345678-9">
+                            <button class="btn btn-primary" type="button" id="btn-buscar">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Ingrese el RUT sin puntos, con guión</small>
+                    </div>
+                    
+                    <div id="persona-info"></div>
+                    <hr>
+                    {% endif %}
+                    
+                    <form method="POST" id="form-tens" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if not persona %}
+                        <!-- Campo oculto para RUT (cuando se busca) -->
+                        <input type="hidden" name="rut_persona" id="rut_persona">
+                        {% endif %}
+                        
+                        <!-- Nivel de Certificación -->
+                        <div class="mb-3">
+                            <label for="{{ form.Nivel_certificacion.id_for_label }}" class="form-label">
+                                Nivel de Certificación <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Nivel_certificacion }}
+                            {% if form.Nivel_certificacion.errors %}
+                                <div class="text-danger small">{{ form.Nivel_certificacion.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Nivel técnico alcanzado (Básico, Medio, Superior)
+                            </small>
+                        </div>
+                        
+                        <!-- Institución Certificadora -->
+                        <div class="mb-3">
+                            <label for="{{ form.Institucion_certificadora.id_for_label }}" class="form-label">
+                                Institución Certificadora <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Institucion_certificadora }}
+                            {% if form.Institucion_certificadora.errors %}
+                                <div class="text-danger small">{{ form.Institucion_certificadora.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Fecha de Certificación -->
+                        <div class="mb-3">
+                            <label for="{{ form.Fecha_certificacion.id_for_label }}" class="form-label">
+                                Fecha de Certificación <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Fecha_certificacion }}
+                            {% if form.Fecha_certificacion.errors %}
+                                <div class="text-danger small">{{ form.Fecha_certificacion.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Años de Experiencia -->
+                        <div class="mb-3">
+                            <label for="{{ form.Anos_experiencia.id_for_label }}" class="form-label">
+                                Años de Experiencia <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Anos_experiencia }}
+                            {% if form.Anos_experiencia.errors %}
+                                <div class="text-danger small">{{ form.Anos_experiencia.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Turno -->
+                        <div class="mb-3">
+                            <label for="{{ form.Turno.id_for_label }}" class="form-label">
+                                Turno <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Turno }}
+                            {% if form.Turno.errors %}
+                                <div class="text-danger small">{{ form.Turno.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if persona %}{% url 'gestion:gestionar_roles' persona.pk %}{% else %}{% url 'home' %}{% endif %}" 
+                               class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save"></i> Guardar TENS
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if not persona %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="bi bi-question-circle"></i> ¿La persona no está registrada?</h6>
+                    <p class="mb-0">
+                        Debe <a href="{% url 'gestion:registrar_persona' %}" target="_blank">registrar los datos básicos</a> 
+                        antes de asignar el rol de TENS.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not persona %}
+<script src="{% static 'js/buscar_persona.js' %}"></script>
+<script>
+// Búsqueda manual con botón
+document.getElementById('btn-buscar').addEventListener('click', function() {
+    const rut = document.getElementById('buscar-rut').value.trim();
+    
+    if (!rut) {
+        alert('Por favor ingrese un RUT');
+        return;
+    }
+    
+    // Buscar persona
+    fetch(`/gestion/api/persona/buscar/?rut=${encodeURIComponent(rut)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.encontrado) {
+                document.getElementById('persona-info').innerHTML = `
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-check-circle"></i> Persona Encontrada
+                        </h6>
+                        <p class="mb-0"><strong>Nombre:</strong> ${data.persona.nombre_completo}</p>
+                    </div>
+                `;
+                document.getElementById('rut_persona').value = data.persona.rut;
+            } else {
+                document.getElementById('persona-info').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> Persona no encontrada
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al buscar persona');
+        });
+});
+</script>
+{% endif %}
+{% endblock %}

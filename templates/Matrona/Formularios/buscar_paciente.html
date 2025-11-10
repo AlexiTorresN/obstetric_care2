@@ -1,0 +1,184 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Buscar Paciente - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">
+                <i class="bi bi-search"></i> Buscar Paciente
+            </h2>
+            <p class="text-muted">Busque por RUT o nombre del paciente</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Formulario de Búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" action="" class="row g-3">
+                <div class="col-md-10">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-primary text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            name="q" 
+                            value="{{ query }}"
+                            placeholder="Ingrese RUT (ej: 12345678-9) o Nombre del paciente"
+                            autofocus
+                        >
+                    </div>
+                    <small class="form-text text-muted">
+                        Puede buscar por RUT completo, nombre o apellidos
+                    </small>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultados de Búsqueda -->
+    {% if query %}
+        {% if pacientes %}
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-check-circle"></i> 
+                    Resultados encontrados: {{ pacientes|length }}
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>RUT</th>
+                                <th>Nombre Completo</th>
+                                <th>Edad</th>
+                                <th>Fecha Nacimiento</th>
+                                <th>Fichas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for paciente in pacientes %}
+                            <tr>
+                                <td><strong>{{ paciente.persona.Rut }}</strong></td>
+                                <td>
+                                    {{ paciente.persona.Nombre }} 
+                                    {{ paciente.persona.Apellido_Paterno }} 
+                                    {{ paciente.persona.Apellido_Materno }}
+                                </td>
+                                <td>{{ paciente.Edad }} años</td>
+                                <td>{{ paciente.persona.Fecha_nacimiento|date:"d/m/Y" }}</td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ paciente.num_fichas|default:0 }} ficha(s)
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'matrona:lista_fichas_paciente' paciente.pk %}" 
+                                           class="btn btn-sm btn-primary"
+                                           title="Ver Fichas">
+                                            <i class="bi bi-file-medical"></i> Fichas
+                                        </a>
+                                        <a href="{% url 'matrona:crear_ficha' paciente.pk %}" 
+                                           class="btn btn-sm btn-success"
+                                           title="Nueva Ficha">
+                                            <i class="bi bi-plus-circle"></i> Nueva
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            <h5><i class="bi bi-exclamation-triangle"></i> No se encontraron resultados</h5>
+            <p>No se encontraron pacientes que coincidan con: <strong>"{{ query }}"</strong></p>
+            <hr>
+            <p class="mb-0">
+                <strong>Sugerencias:</strong>
+                <ul>
+                    <li>Verifique que el RUT esté escrito correctamente</li>
+                    <li>Intente buscar solo por nombre o apellido</li>
+                    <li>Use menos palabras en la búsqueda</li>
+                </ul>
+            </p>
+        </div>
+        
+        <!-- Opción para registrar nuevo paciente -->
+        <div class="card shadow-sm border-primary">
+            <div class="card-body text-center">
+                <h5><i class="bi bi-person-plus"></i> ¿El paciente no está registrado?</h5>
+                <p class="text-muted">Puede registrar un nuevo paciente en el sistema</p>
+                <a href="{% url 'matrona:registrar_paciente' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Registrar Nuevo Paciente
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+        <!-- Mensaje inicial -->
+        <div class="alert alert-info" role="alert">
+            <h5><i class="bi bi-info-circle"></i> Instrucciones de búsqueda</h5>
+            <ul class="mb-0">
+                <li>Ingrese el RUT completo del paciente (con guión y dígito verificador)</li>
+                <li>O ingrese el nombre, apellido paterno o apellido materno</li>
+                <li>La búsqueda mostrará todos los pacientes activos que coincidan</li>
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Botón Volver -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'matrona:menu_matrona' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al Menú
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+    
+    .btn-group .btn {
+        margin: 0 2px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Limpiar búsqueda al presionar ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelector('input[name="q"]').value = '';
+        document.querySelector('input[name="q"]').focus();
+    }
+});
+
+console.log('✅ Búsqueda de pacientes cargada');
+</script>
+{% endblock %}

@@ -1,0 +1,273 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Gestionar Roles - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-person-gear"></i> Gestión de Roles
+                </h4>
+                <span class="badge bg-warning text-dark">
+                    <i class="bi bi-shield-lock"></i> Solo Administrador
+                </span>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Información de la Persona -->
+            <div class="alert alert-light border">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-2">
+                            <i class="bi bi-person-badge-fill"></i> 
+                            {{ persona.Nombre }} {{ persona.Apellido }}
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>RUT:</strong> {{ persona.Rut }}</p>
+                                <p class="mb-1"><strong>Sexo:</strong> {{ persona.Sexo }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Fecha Nac:</strong> {{ persona.Fecha_nacimiento|date:"d/m/Y" }}</p>
+                                <p class="mb-1"><strong>Edad:</strong> {{ persona.calcular_edad }} años</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{% url 'gestion:detalle_persona' persona.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye"></i> Ver Detalle Completo
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="text-primary mb-3">
+                <i class="bi bi-shield-plus"></i> Asignar Roles
+            </h5>
+            <p class="text-muted small mb-4">
+                <i class="bi bi-info-circle"></i> 
+                Una persona puede tener múltiples roles simultáneamente. 
+                Seleccione los roles que desea asignar.
+            </p>
+
+            <!-- Grid de Roles -->
+            <div class="row g-3">
+                <!-- ROL: PACIENTE -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 {% if roles.es_paciente %}border-danger{% else %}border-secondary{% endif %}">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-hearts {% if roles.es_paciente %}text-danger{% else %}text-secondary{% endif %}" 
+                               style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">Paciente</h5>
+                            
+                            {% if roles.es_paciente %}
+                                <span class="badge bg-danger mb-2">
+                                    <i class="bi bi-check-circle"></i> Asignado
+                                </span>
+                                <div class="small text-muted mb-3">
+                                    Registrado: {{ persona.paciente.fecha_creacion|date:"d/m/Y" }}
+                                </div>
+                                <button class="btn btn-outline-danger btn-sm w-100" disabled>
+                                    <i class="bi bi-trash"></i> Quitar Rol
+                                </button>
+                            {% else %}
+                                <span class="badge bg-secondary mb-3">No asignado</span>
+                                <a href="{% url 'gestion:asignar_rol_paciente' persona.pk %}" 
+                                   class="btn btn-danger btn-sm w-100">
+                                    <i class="bi bi-plus-circle"></i> Asignar Rol
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROL: MÉDICO -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 {% if roles.es_medico %}border-success{% else %}border-secondary{% endif %}">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clipboard2-pulse {% if roles.es_medico %}text-success{% else %}text-secondary{% endif %}" 
+                               style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">Médico</h5>
+                            
+                            {% if roles.es_medico %}
+                                <span class="badge bg-success mb-2">
+                                    <i class="bi bi-check-circle"></i> Asignado
+                                </span>
+                                <div class="small text-muted mb-1">
+                                    <strong>{{ persona.medico.Especialidad }}</strong>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    Reg: {{ persona.medico.Registro_medico }}
+                                </div>
+                                <button class="btn btn-outline-danger btn-sm w-100" disabled>
+                                    <i class="bi bi-trash"></i> Quitar Rol
+                                </button>
+                            {% else %}
+                                <span class="badge bg-secondary mb-3">No asignado</span>
+                                <a href="{% url 'gestion:asignar_rol_medico' persona.pk %}" 
+                                   class="btn btn-success btn-sm w-100">
+                                    <i class="bi bi-plus-circle"></i> Asignar Rol
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROL: MATRONA -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 {% if roles.es_matrona %}border-info{% else %}border-secondary{% endif %}">
+                        <div class="card-body text-center">
+                            <i class="bi bi-heart-pulse {% if roles.es_matrona %}text-info{% else %}text-secondary{% endif %}" 
+                               style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">Matrona</h5>
+                            
+                            {% if roles.es_matrona %}
+                                <span class="badge bg-info text-dark mb-2">
+                                    <i class="bi bi-check-circle"></i> Asignado
+                                </span>
+                                <div class="small text-muted mb-1">
+                                    <strong>{{ persona.matrona.Area_especialidad }}</strong>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    {{ persona.matrona.Anos_experiencia }} años exp.
+                                </div>
+                                <button class="btn btn-outline-danger btn-sm w-100" disabled>
+                                    <i class="bi bi-trash"></i> Quitar Rol
+                                </button>
+                            {% else %}
+                                <span class="badge bg-secondary mb-3">No asignado</span>
+                                <a href="{% url 'gestion:asignar_rol_matrona' persona.pk %}" 
+                                   class="btn btn-info btn-sm w-100">
+                                    <i class="bi bi-plus-circle"></i> Asignar Rol
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROL: TENS -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 {% if roles.es_tens %}border-warning{% else %}border-secondary{% endif %}">
+                        <div class="card-body text-center">
+                            <i class="bi bi-bandaid {% if roles.es_tens %}text-warning{% else %}text-secondary{% endif %}" 
+                               style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">TENS</h5>
+                            
+                            {% if roles.es_tens %}
+                                <span class="badge bg-warning text-dark mb-2">
+                                    <i class="bi bi-check-circle"></i> Asignado
+                                </span>
+                                <div class="small text-muted mb-1">
+                                    <strong>{{ persona.tens.Nivel_certificacion }}</strong>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    Turno: {{ persona.tens.Turno }}
+                                </div>
+                                <button class="btn btn-outline-danger btn-sm w-100" disabled>
+                                    <i class="bi bi-trash"></i> Quitar Rol
+                                </button>
+                            {% else %}
+                                <span class="badge bg-secondary mb-3">No asignado</span>
+                                <a href="{% url 'gestion:asignar_rol_tens' persona.pk %}" 
+                                   class="btn btn-warning btn-sm w-100">
+                                    <i class="bi bi-plus-circle"></i> Asignar Rol
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mt-4">
+
+            <!-- Resumen de Roles Activos -->
+            <div class="alert alert-light">
+                <h6><i class="bi bi-list-check"></i> Resumen de Roles Activos</h6>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    {% if roles.es_paciente %}
+                        <span class="badge bg-danger fs-6">
+                            <i class="bi bi-person-hearts"></i> Paciente
+                        </span>
+                    {% endif %}
+                    {% if roles.es_medico %}
+                        <span class="badge bg-success fs-6">
+                            <i class="bi bi-clipboard2-pulse"></i> Médico
+                        </span>
+                    {% endif %}
+                    {% if roles.es_matrona %}
+                        <span class="badge bg-info fs-6">
+                            <i class="bi bi-heart-pulse"></i> Matrona
+                        </span>
+                    {% endif %}
+                    {% if roles.es_tens %}
+                        <span class="badge bg-warning text-dark fs-6">
+                            <i class="bi bi-bandaid"></i> TENS
+                        </span>
+                    {% endif %}
+                    
+                    {% if not roles.es_paciente and not roles.es_medico and not roles.es_matrona and not roles.es_tens %}
+                        <span class="text-muted">
+                            <i class="bi bi-exclamation-circle"></i> 
+                            No hay roles asignados a esta persona
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Información Importante -->
+            <div class="alert alert-warning">
+                <h6><i class="bi bi-exclamation-triangle"></i> Importante</h6>
+                <ul class="mb-0 small">
+                    <li>Los roles <strong>NO pueden eliminarse</strong> desde esta interfaz por seguridad.</li>
+                    <li>Para remover un rol, contacte al administrador del sistema.</li>
+                    <li>Los cambios de roles quedan registrados en el sistema de auditoría.</li>
+                    <li>Una persona puede tener múltiples roles profesionales simultáneamente.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'gestion:lista_personas' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Lista
+                </a>
+                <a href="{% url 'gestion:detalle_persona' persona.pk %}" class="btn btn-primary">
+                    <i class="bi bi-eye"></i> Ver Detalle Completo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Gestión de roles cargada:', {
+    persona: '{{ persona.Rut }}',
+    roles_actuales: {
+        paciente: {{ roles.es_paciente|yesno:"true,false" }},
+        medico: {{ roles.es_medico|yesno:"true,false" }},
+        matrona: {{ roles.es_matrona|yesno:"true,false" }},
+        tens: {{ roles.es_tens|yesno:"true,false" }}
+    }
+});
+
+// Confirmación antes de asignar rol
+document.querySelectorAll('a[href*="asignar_rol"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        const rol = this.textContent.trim().replace('Asignar Rol', '').trim();
+        const confirmar = confirm(`¿Está seguro de asignar el rol de ${rol} a esta persona?\n\nEsta acción quedará registrada en el sistema.`);
+        
+        if (!confirmar) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

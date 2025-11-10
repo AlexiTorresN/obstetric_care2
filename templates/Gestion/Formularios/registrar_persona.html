@@ -1,0 +1,704 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Registrar Nueva Persona - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="card mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-person-plus-fill"></i> Registrar Nueva Persona
+            </h3>
+        </div>
+        <div class="card-body">
+            <!-- Alerta Informativa -->
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> 
+                <strong>Importante:</strong> Registre primero los datos básicos de la persona. 
+                Luego podrá asignar roles específicos (Paciente, Médico, Matrona, TENS).
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario Principal -->
+    <form method="post" id="formRegistrarPersona" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Mostrar Errores Generales -->
+        {% if form.errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading">
+                <i class="bi bi-exclamation-triangle"></i> Por favor corrija los siguientes errores:
+            </h5>
+            <ul class="mb-0">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+
+        <!-- SECCIÓN 1: Datos de Identificación -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light border-primary">
+                <h5 class="mb-0 text-primary">
+                    <i class="bi bi-card-text"></i> Datos de Identificación
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- RUT -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_rut" class="form-label">
+                            RUT <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                            class="form-control" 
+                            id="id_rut" 
+                            name="Rut" 
+                            placeholder="12345678-9"
+                            required
+                            maxlength="12">
+                        <small class="form-text text-muted">
+                            Formato: 12345678-9 (sin puntos)
+                        </small>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_nombre" class="form-label">
+                            Nombre(s) <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                            class="form-control" 
+                            id="id_nombre" 
+                            name="Nombre" 
+                            placeholder="Ingrese nombre"
+                            required
+                            maxlength="100">
+                    </div>
+
+                    <!-- Apellido Paterno -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_apellido_paterno" class="form-label">
+                            Apellido Paterno <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                            class="form-control" 
+                            id="id_apellido_paterno" 
+                            name="Apellido_Paterno" 
+                            placeholder="Apellido paterno"
+                            required
+                            maxlength="50">
+                    </div>
+
+                    <!-- Apellido Materno -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_apellido_materno" class="form-label">
+                            Apellido Materno <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                            class="form-control" 
+                            id="id_apellido_materno" 
+                            name="Apellido_Materno" 
+                            placeholder="Apellido materno"
+                            required
+                            maxlength="50">
+                    </div>
+
+                    <!-- Sexo -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_sexo" class="form-label">
+                            Sexo <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="id_sexo" name="Sexo" required>
+                            <option value="">---------</option>
+                            <option value="F">Femenino</option>
+                            <option value="M">Masculino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+
+                    <!-- Fecha de Nacimiento -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_fecha_nacimiento" class="form-label">
+                            Fecha de Nacimiento <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" 
+                            class="form-control" 
+                            id="id_fecha_nacimiento" 
+                            name="Fecha_nacimiento"
+                            required
+                            max="{{ fecha_maxima }}">
+                        <small class="form-text text-muted" id="edadCalculada"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: Datos de Contacto -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light border-success">
+                <h5 class="mb-0 text-success">
+                    <i class="bi bi-telephone-fill"></i> Datos de Contacto
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Teléfono -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_telefono" class="form-label">
+                            Teléfono <span class="text-danger">*</span>
+                        </label>
+                        <input type="tel" 
+                            class="form-control" 
+                            id="id_telefono" 
+                            name="Telefono" 
+                            placeholder="+56912345678"
+                            required
+                            maxlength="15">
+                        <small class="form-text text-muted">
+                            Formato: +56912345678
+                        </small>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_email" class="form-label">
+                            Email
+                        </label>
+                        <input type="email" 
+                            class="form-control" 
+                            id="id_email" 
+                            name="Email" 
+                            placeholder="correo@ejemplo.com"
+                            maxlength="100">
+                        <small class="form-text text-muted">
+                            Opcional pero recomendado
+                        </small>
+                    </div>
+
+                    <!-- Teléfono Alternativo -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_telefono_alternativo" class="form-label">
+                            Teléfono Alternativo
+                        </label>
+                        <input type="tel" 
+                            class="form-control" 
+                            id="id_telefono_alternativo" 
+                            name="Telefono_Alternativo" 
+                            placeholder="+56987654321"
+                            maxlength="15">
+                    </div>
+
+                    <!-- Dirección Completa -->
+                    <div class="col-md-12 mb-3">
+                        <label for="id_direccion" class="form-label">
+                            Dirección Completa <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                            class="form-control" 
+                            id="id_direccion" 
+                            name="Direccion" 
+                            placeholder="Calle, número, comuna"
+                            required
+                            maxlength="200">
+                        <small class="form-text text-muted">
+                            Ejemplo: Av. Libertad 123, Dpto 4B, Chillán
+                        </small>
+                    </div>
+
+                    <!-- Comuna -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_comuna" class="form-label">
+                            Comuna
+                        </label>
+                        <input type="text" 
+                            class="form-control" 
+                            id="id_comuna" 
+                            name="Comuna" 
+                            placeholder="Ej: Chillán, Concepción"
+                            maxlength="50">
+                    </div>
+
+                    <!-- Ciudad/Región -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_region" class="form-label">
+                            Región
+                        </label>
+                        <select class="form-select" id="id_region" name="Region">
+                            <option value="">---------</option>
+                            <option value="Arica y Parinacota">Arica y Parinacota</option>
+                            <option value="Tarapacá">Tarapacá</option>
+                            <option value="Antofagasta">Antofagasta</option>
+                            <option value="Atacama">Atacama</option>
+                            <option value="Coquimbo">Coquimbo</option>
+                            <option value="Valparaíso">Valparaíso</option>
+                            <option value="Metropolitana">Metropolitana de Santiago</option>
+                            <option value="O'Higgins">Libertador General Bernardo O'Higgins</option>
+                            <option value="Maule">Maule</option>
+                            <option value="Ñuble">Ñuble</option>
+                            <option value="Biobío">Biobío</option>
+                            <option value="La Araucanía">La Araucanía</option>
+                            <option value="Los Ríos">Los Ríos</option>
+                            <option value="Los Lagos">Los Lagos</option>
+                            <option value="Aysén">Aysén del General Carlos Ibáñez del Campo</option>
+                            <option value="Magallanes">Magallanes y de la Antártica Chilena</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: Información Médica (para pacientes) -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light border-danger">
+                <h5 class="mb-0 text-danger">
+                    <i class="bi bi-heart-pulse-fill"></i> Información Médica
+                    <small class="text-muted">(Opcional - Requerido si será paciente)</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Previsión -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_prevision" class="form-label">
+                            Previsión de Salud
+                        </label>
+                        <select class="form-select" id="id_prevision" name="Prevision">
+                            <option value="">---------</option>
+                            <option value="FONASA">FONASA</option>
+                            <option value="ISAPRE">ISAPRE</option>
+                            <option value="CAPREDENA">CAPREDENA</option>
+                            <option value="DIPRECA">DIPRECA</option>
+                            <option value="Particular">Particular</option>
+                        </select>
+                    </div>
+
+                    <!-- Grupo Sanguíneo -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_grupo_sanguineo" class="form-label">
+                            Grupo Sanguíneo
+                        </label>
+                        <select class="form-select" id="id_grupo_sanguineo" name="Grupo_Sanguineo">
+                            <option value="">---------</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="AB">AB</option>
+                            <option value="O">O</option>
+                        </select>
+                    </div>
+
+                    <!-- Factor RH -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_factor_rh" class="form-label">
+                            Factor RH
+                        </label>
+                        <select class="form-select" id="id_factor_rh" name="Factor_RH">
+                            <option value="">---------</option>
+                            <option value="+">Positivo (+)</option>
+                            <option value="-">Negativo (-)</option>
+                        </select>
+                    </div>
+
+                    <!-- Alergias -->
+                    <div class="col-md-12 mb-3">
+                        <label for="id_alergias" class="form-label">
+                            Alergias Conocidas
+                        </label>
+                        <textarea class="form-control" 
+                                  id="id_alergias" 
+                                  name="Alergias" 
+                                  rows="2"
+                                  placeholder="Describa alergias a medicamentos, alimentos, etc."></textarea>
+                        <small class="form-text text-muted">
+                            Medicamentos, alimentos, u otras sustancias
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: Contacto de Emergencia -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light border-warning">
+                <h5 class="mb-0 text-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Contacto de Emergencia
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Nombre del Contacto -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_contacto_emergencia_nombre" class="form-label">
+                            Nombre del Contacto
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="id_contacto_emergencia_nombre" 
+                               name="Contacto_Emergencia_Nombre" 
+                               placeholder="Nombre completo"
+                               maxlength="100">
+                    </div>
+
+                    <!-- Teléfono de Emergencia -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_contacto_emergencia" class="form-label">
+                            Teléfono de Emergencia <span class="text-danger">*</span>
+                        </label>
+                        <input type="tel" 
+                               class="form-control" 
+                               id="id_contacto_emergencia" 
+                               name="Contacto_Emergencia" 
+                               placeholder="+56987654321"
+                               required
+                               maxlength="15">
+                    </div>
+
+                    <!-- Relación -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_relacion_emergencia" class="form-label">
+                            Relación con el Paciente
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="id_relacion_emergencia" 
+                               name="Relacion_Emergencia" 
+                               placeholder="Ej: Esposo, Madre, Hermana"
+                               maxlength="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: Foto y Observaciones -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light border-info">
+                <h5 class="mb-0 text-info">
+                    <i class="bi bi-image-fill"></i> Foto y Observaciones
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Foto -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_foto" class="form-label">
+                            Foto de Perfil
+                        </label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="id_foto" 
+                               name="foto"
+                               accept="image/*">
+                        <small class="form-text text-muted">
+                            Formatos: JPG, PNG, GIF (máx. 5MB)
+                        </small>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Estado</label>
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="id_activo" 
+                                   name="Activo"
+                                   checked>
+                            <label class="form-check-label" for="id_activo">
+                                <strong>Persona Activa</strong>
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            Por defecto las personas se registran como activas
+                        </small>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="col-md-12 mb-3">
+                        <label for="id_observaciones" class="form-label">
+                            Observaciones Generales
+                        </label>
+                        <textarea class="form-control" 
+                                  id="id_observaciones" 
+                                  name="Observaciones" 
+                                  rows="3"
+                                  placeholder="Información adicional relevante..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> Registrar Persona
+                        </button>
+                        <a href="{% url 'gestion:listar_personas' %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="reset" class="btn btn-outline-warning btn-lg">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar Formulario
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de Ayuda -->
+        <div class="alert alert-secondary" role="alert">
+            <h6><i class="bi bi-info-circle"></i> Información Importante</h6>
+            <ul class="mb-0 small">
+                <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+                <li>El RUT debe ser válido y único en el sistema</li>
+                <li>Después de registrar la persona, podrá asignarle roles (Paciente, Médico, Matrona, TENS)</li>
+                <li>La información médica es opcional, pero requerida si la persona será paciente</li>
+                <li>El contacto de emergencia es fundamental para pacientes</li>
+            </ul>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-label {
+        font-weight: 500;
+    }
+    
+    .text-danger {
+        font-weight: bold;
+    }
+    
+    .alert-info {
+        border-left: 4px solid #0dcaf0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ============================================
+// VALIDACIÓN DE RUT CHILENO
+// ============================================
+function validarRut(rut) {
+    // Eliminar puntos y guión
+    rut = rut.replace(/\./g, '').replace(/-/g, '');
+    
+    if (rut.length < 2) return false;
+    
+    const cuerpo = rut.slice(0, -1);
+    const dv = rut.slice(-1).toUpperCase();
+    
+    let suma = 0;
+    let multiplo = 2;
+    
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+        suma += parseInt(cuerpo.charAt(i)) * multiplo;
+        multiplo = multiplo === 7 ? 2 : multiplo + 1;
+    }
+    
+    const dvEsperado = 11 - (suma % 11);
+    const dvCalculado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+    
+    return dv === dvCalculado;
+}
+
+// ============================================
+// FORMATEAR RUT MIENTRAS SE ESCRIBE
+// ============================================
+document.getElementById('id_rut')?.addEventListener('input', function(e) {
+    let rut = this.value.replace(/\./g, '').replace(/-/g, '');
+    
+    // Limitar a números y K
+    rut = rut.replace(/[^0-9kK]/g, '');
+    
+    // Formatear con guión
+    if (rut.length > 1) {
+        rut = rut.slice(0, -1) + '-' + rut.slice(-1);
+    }
+    
+    this.value = rut.toUpperCase();
+    
+    // Validar si tiene formato completo
+    if (rut.length >= 9) {
+        if (validarRut(rut)) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+            this.classList.add('is-invalid');
+        }
+    } else {
+        this.classList.remove('is-valid', 'is-invalid');
+    }
+});
+
+// ============================================
+// CALCULAR EDAD AUTOMÁTICAMENTE
+// ============================================
+document.getElementById('id_fecha_nacimiento')?.addEventListener('change', function() {
+    const fechaNac = new Date(this.value);
+    const hoy = new Date();
+    
+    if (fechaNac > hoy) {
+        alert('⚠️ La fecha de nacimiento no puede ser futura');
+        this.value = '';
+        return;
+    }
+    
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    const mes = hoy.getMonth() - fechaNac.getMonth();
+    
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+        edad--;
+    }
+    
+    document.getElementById('edadCalculada').textContent = `Edad: ${edad} años`;
+    
+    // Advertencia si es menor de edad
+    if (edad < 18) {
+        document.getElementById('edadCalculada').innerHTML += ' <span class="text-warning">(Menor de edad)</span>';
+    }
+});
+
+// ============================================
+// FORMATEAR TELÉFONO
+// ============================================
+function formatearTelefono(input) {
+    let valor = input.value.replace(/[^0-9+]/g, '');
+    
+    // Si no comienza con +, agregar +56
+    if (!valor.startsWith('+')) {
+        if (valor.startsWith('56')) {
+            valor = '+' + valor;
+        } else if (valor.startsWith('9')) {
+            valor = '+56' + valor;
+        }
+    }
+    
+    input.value = valor;
+}
+
+document.getElementById('id_telefono')?.addEventListener('blur', function() {
+    formatearTelefono(this);
+});
+
+document.getElementById('id_telefono_alternativo')?.addEventListener('blur', function() {
+    formatearTelefono(this);
+});
+
+document.getElementById('id_contacto_emergencia')?.addEventListener('blur', function() {
+    formatearTelefono(this);
+});
+
+// ============================================
+// VALIDAR EMAIL
+// ============================================
+document.getElementById('id_email')?.addEventListener('blur', function() {
+    if (this.value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.value)) {
+            this.classList.add('is-invalid');
+            alert('⚠️ Por favor ingrese un email válido');
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    }
+});
+
+// ============================================
+// PREVISUALIZAR FOTO
+// ============================================
+document.getElementById('id_foto')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Validar tamaño (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('❌ La imagen no puede superar los 5MB');
+            this.value = '';
+            return;
+        }
+        
+        // Validar tipo
+        if (!file.type.startsWith('image/')) {
+            alert('❌ Solo se permiten archivos de imagen');
+            this.value = '';
+            return;
+        }
+        
+        console.log('✅ Imagen seleccionada:', file.name);
+    }
+});
+
+// ============================================
+// VALIDAR FORMULARIO ANTES DE ENVIAR
+// ============================================
+document.getElementById('formRegistrarPersona')?.addEventListener('submit', function(e) {
+    const rut = document.getElementById('id_rut').value;
+    
+    // Validar RUT
+    if (!validarRut(rut)) {
+        e.preventDefault();
+        alert('❌ El RUT ingresado no es válido. Por favor verifique.');
+        document.getElementById('id_rut').focus();
+        return false;
+    }
+    
+    // Validar edad
+    const fechaNac = new Date(document.getElementById('id_fecha_nacimiento').value);
+    const hoy = new Date();
+    const edad = Math.floor((hoy - fechaNac) / (365.25 * 24 * 60 * 60 * 1000));
+    
+    if (edad < 0 || edad > 120) {
+        e.preventDefault();
+        alert('❌ La edad calculada no es válida');
+        return false;
+    }
+    
+    // Confirmación final
+    const confirmacion = confirm('¿Confirma que desea registrar esta persona con los datos ingresados?');
+    if (!confirmacion) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// ============================================
+// ESTABLECER FECHA MÁXIMA (HOY)
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const hoy = new Date().toISOString().split('T')[0];
+    document.getElementById('id_fecha_nacimiento')?.setAttribute('max', hoy);
+});
+
+// ============================================
+// AUTOCOMPLETAR DIRECCIÓN SEGÚN REGIÓN
+// ============================================
+document.getElementById('id_region')?.addEventListener('change', function() {
+    const comuna = document.getElementById('id_comuna');
+    if (this.value && !comuna.value) {
+        // Aquí podrías implementar un autocompletado de comunas según región
+        console.log('Región seleccionada:', this.value);
+    }
+});
+
+console.log('✅ Formulario de registro de persona cargado correctamente');
+</script>
+{% endblock %}

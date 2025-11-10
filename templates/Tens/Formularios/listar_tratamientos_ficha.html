@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    
+    <!-- Header con información de la ficha -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">
+                        <i class="bi bi-clipboard2-pulse"></i> {{ titulo }}
+                    </h4>
+                    <small>Ficha: {{ ficha.numero_ficha }} | Paciente: {{ paciente.persona.Nombre }} {{ paciente.persona.Apellido_Paterno }}</small>
+                </div>
+                <a href="{% url 'tens:registrar_tratamiento_ficha' ficha.pk %}" 
+                   class="btn btn-success">
+                    <i class="bi bi-plus-lg"></i> Registrar Tratamiento
+                </a>
+            </div>
+        </div>
+        <div class="card-body bg-light">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong><i class="bi bi-person-fill"></i> Paciente:</strong> 
+                        {{ paciente.persona.Nombre }} {{ paciente.persona.Apellido_Paterno }} {{ paciente.persona.Apellido_Materno }}
+                    </p>
+                    <p class="mb-0"><strong><i class="bi bi-card-text"></i> RUT:</strong> {{ paciente.persona.Rut }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong><i class="bi bi-heart-pulse"></i> Edad Gestacional:</strong> 
+                        {{ ficha.get_edad_gestacional_completa }}
+                    </p>
+                    <p class="mb-0"><strong><i class="bi bi-file-medical"></i> Fórmula Obstétrica:</strong> 
+                        <span class="badge bg-info">{{ ficha.get_formula_obstetrica }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-success">
+                <div class="card-body">
+                    <h3 class="text-success">{{ total_tratamientos }}</h3>
+                    <p class="text-muted mb-0">Tratamientos Registrados</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ tratamientos|length }}</h3>
+                    <p class="text-muted mb-0">Mostrando</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-warning">
+                <div class="card-body">
+                    <h3 class="text-warning">
+                        {% if tratamientos %}
+                            {{ tratamientos.first.fecha_aplicacion|date:"d/m/Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </h3>
+                    <p class="text-muted mb-0">Último Tratamiento</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de tratamientos -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Historial de Tratamientos</h5>
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-primary active" id="btn-todos">
+                    Todos
+                </button>
+                <button type="button" class="btn btn-outline-success" id="btn-activos">
+                    Activos
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="btn-inactivos">
+                    Inactivos
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if tratamientos %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabla-tratamientos">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Medicamento</th>
+                                <th>Dosis</th>
+                                <th>Vía</th>
+                                <th>TENS Responsable</th>
+                                <th>Observaciones</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trat in tratamientos %}
+                            <tr class="{% if not trat.activo %}table-secondary{% endif %}" 
+                                data-estado="{% if trat.activo %}activo{% else %}inactivo{% endif %}">
+                                <td>
+                                    <strong>{{ trat.fecha_aplicacion|date:"d/m/Y" }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i> {{ trat.hora_aplicacion|time:"H:i" }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong>{{ trat.nombre_medicamento }}</strong>
+                                    {% if trat.medicamento_ficha %}
+                                        <br>
+                                        <small class="text-muted">
+                                            <i class="bi bi-link-45deg"></i> Vinculado a prescripción
+                                        </small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ trat.dosis|default:"—" }}</td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ trat.get_via_administracion_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>
+                                        <i class="bi bi-person-badge"></i>
+                                        {{ trat.tens.persona.Nombre }} 
+                                        {{ trat.tens.persona.Apellido_Paterno }}
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if trat.observaciones %}
+                                        <button type="button" class="btn btn-sm btn-outline-info" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modalObs{{ trat.pk }}">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </button>
+                                        
+                                        <!-- Modal para observaciones -->
+                                        <div class="modal fade" id="modalObs{{ trat.pk }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Observaciones</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p><strong>Medicamento:</strong> {{ trat.nombre_medicamento }}</p>
+                                                        <p><strong>Fecha:</strong> {{ trat.fecha_aplicacion|date:"d/m/Y H:i" }}</p>
+                                                        <hr>
+                                                        <p>{{ trat.observaciones }}</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <small class="text-muted">Sin observaciones</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if trat.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        {% if trat.activo %}
+                                            <a href="{% url 'tens:editar_tratamiento' tratamiento_pk=trat.pk %}" 
+                                               class="btn btn-warning btn-sm" 
+                                               title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'tens:eliminar_tratamiento' tratamiento_pk=trat.pk %}" 
+                                               class="btn btn-danger btn-sm" 
+                                               title="Eliminar"
+                                               onclick="return confirm('¿Está seguro de eliminar este tratamiento?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'tens:restaurar_tratamiento' tratamiento_pk=trat.pk %}" 
+                                               class="btn btn-success btn-sm" 
+                                               title="Restaurar">
+                                                <i class="bi bi-arrow-counterclockwise"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Total de tratamientos en esta ficha:</strong> {{ total_tratamientos }}
+                </div>
+            {% else %}
+                <div class="alert alert-warning text-center">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3">No hay tratamientos registrados en esta ficha</h5>
+                    <p class="text-muted">Registre el primer tratamiento aplicado a este paciente.</p>
+                    <a href="{% url 'tens:registrar_tratamiento_ficha' ficha.pk %}" 
+                       class="btn btn-success mt-3">
+                        <i class="bi bi-plus-lg"></i> Registrar Tratamiento
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="mt-4">
+        <a href="{% url 'tens:detalle_ficha' ficha.pk %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Volver a Ficha
+        </a>
+        <a href="{% url 'tens:ver_fichas_paciente' paciente.pk %}" class="btn btn-outline-secondary">
+            <i class="bi bi-folder"></i> Ver Todas las Fichas
+        </a>
+        <a href="{% url 'tens:buscar_paciente' %}" class="btn btn-outline-primary">
+            <i class="bi bi-search"></i> Buscar Otro Paciente
+        </a>
+    </div>
+
+</div>
+
+{% block extra_js %}
+<script>
+    // Filtrar tratamientos por estado
+    const btnTodos = document.getElementById('btn-todos');
+    const btnActivos = document.getElementById('btn-activos');
+    const btnInactivos = document.getElementById('btn-inactivos');
+    const filas = document.querySelectorAll('#tabla-tratamientos tbody tr');
+
+    function filtrarTratamientos(estado) {
+        filas.forEach(fila => {
+            if (estado === 'todos') {
+                fila.style.display = '';
+            } else {
+                const estadoFila = fila.getAttribute('data-estado');
+                fila.style.display = estadoFila === estado ? '' : 'none';
+            }
+        });
+    }
+
+    btnTodos.addEventListener('click', function() {
+        filtrarTratamientos('todos');
+        btnTodos.classList.add('active');
+        btnActivos.classList.remove('active');
+        btnInactivos.classList.remove('active');
+    });
+
+    btnActivos.addEventListener('click', function() {
+        filtrarTratamientos('activo');
+        btnActivos.classList.add('active');
+        btnTodos.classList.remove('active');
+        btnInactivos.classList.remove('active');
+    });
+
+    btnInactivos.addEventListener('click', function() {
+        filtrarTratamientos('inactivo');
+        btnInactivos.classList.add('active');
+        btnTodos.classList.remove('active');
+        btnActivos.classList.remove('active');
+    });
+
+    // Confirmar eliminación
+    document.querySelectorAll('[onclick*="confirm"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            const fila = this.closest('tr');
+            const medicamento = fila.querySelector('td:nth-child(2) strong').textContent;
+            const fecha = fila.querySelector('td:nth-child(1) strong').textContent;
+            const confirmado = confirm(`¿Está seguro de eliminar el tratamiento?\n\nMedicamento: ${medicamento}\nFecha: ${fecha}`);
+            if (!confirmado) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

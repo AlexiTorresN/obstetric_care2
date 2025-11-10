@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Tratamiento Aplicado - Sistema Obstétrico</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css">
+    <style>
+        .form-label {
+            font-weight: 600;
+        }
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <i class="bi bi-hospital"></i> Sistema Obstétrico
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <!-- Inicio -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-house"></i> Inicio
+                    </a>
+                </li>
+                
+                <!-- Gestión -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-people"></i> Gestión
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-person-plus"></i> Registrar Persona
+                        </a></li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-list-ul"></i> Ver Personas
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <!-- Matrona -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-heart-pulse"></i> Matrona
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-house-door"></i> Menú Matrona
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-file-earmark-plus"></i> Nueva Ficha
+                        </a></li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-folder-fill"></i> Ver Todas las Fichas
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <!-- TENS -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-clipboard2-heart"></i> TENS
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-house-door"></i> Menú TENS
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item active" href="#">
+                            <i class="bi bi-syringe"></i> Registrar Tratamiento
+                        </a></li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-activity"></i> Registrar Signos Vitales
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <!-- Usuario -->
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> Usuario
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-gear"></i> Configuración
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    
+    <!-- Header Principal -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-syringe"></i> Registrar Tratamiento Aplicado
+            </h4>
+        </div>
+    </div>
+
+    <!-- Datos de la Paciente (AHORA DINÁMICOS) -->
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-person-badge"></i> Datos de la Paciente
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <p class="mb-2">
+                        <strong><i class="bi bi-file-medical"></i> Ficha:</strong><br>
+                        <span class="text-primary fs-5">{{ ficha.numero_ficha }}</span>
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <p class="mb-2">
+                        <strong><i class="bi bi-person"></i> Nombre Completo:</strong><br>
+                        {{ ficha.paciente.persona.Nombre }} {{ ficha.paciente.persona.Apellido_Paterno }}{% if ficha.paciente.persona.Apellido_Materno %} {{ ficha.paciente.persona.Apellido_Materno }}{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <p class="mb-2">
+                        <strong><i class="bi bi-card-text"></i> RUT:</strong><br>
+                        {{ ficha.paciente.persona.Rut }}
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <p class="mb-2">
+                        <strong><i class="bi bi-calendar-event"></i> Edad:</strong><br>
+                        {{ ficha.paciente.Edad }} años
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selección de TENS -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <i class="bi bi-person-check"></i> TENS Responsable
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-md-6">
+                    <label for="id_tens_responsable" class="form-label">
+                        <i class="bi bi-clipboard2-heart"></i> Seleccione TENS que aplica el tratamiento
+                        <span class="text-danger">*</span>
+                    </label>
+                    <select name="tens_responsable" class="form-select form-select-lg" required id="id_tens_responsable">
+                        <option value="" selected>--- Seleccione un TENS ---</option>
+                        <option value="1" data-nombre="María González Pérez" data-rut="16.789.456-3">María González Pérez - RUT: 16.789.456-3</option>
+                        <option value="2" data-nombre="Carlos Muñoz Silva" data-rut="18.234.567-8">Carlos Muñoz Silva - RUT: 18.234.567-8</option>
+                        <option value="3" data-nombre="Andrea Rojas Fernández" data-rut="17.456.789-2">Andrea Rojas Fernández - RUT: 17.456.789-2</option>
+                        <option value="4" data-nombre="Javier Soto Morales" data-rut="19.123.456-7">Javier Soto Morales - RUT: 19.123.456-7</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Importante:</strong> Seleccione el TENS que está aplicando el tratamiento en este momento.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form id="formTratamiento" method="post" novalidate>
+                <input type="hidden" name="csrfmiddlewaretoken" value="xosqfkPX1las3ZFjHjrzBSu24GtAyrww3lrrsvrLdSsweyXkk0Fs8cTGaYGcEKJg">
+
+                <!-- Medicamento Prescrito en Ficha (Ahora primero) -->
+                <div class="mb-4">
+                    <label for="id_medicamento_ficha" class="form-label">
+                        <i class="bi bi-link"></i> Medicamento
+                    </label>
+                    <select name="medicamento_ficha" class="form-select" id="id_medicamento_ficha">
+                        <option value="" selected>--- Seleccione un medicamento </option>
+                        <option value="1" data-nombre="Sulfato Ferroso" data-dosis="10 mg" data-via="Intramuscular">
+                            Sulfato Ferroso - 10 mg (Intramuscular) - Desde: 16/10/2025
+                        </option>
+                        <option value="2" data-nombre="Ácido Fólico" data-dosis="5 mg" data-via="Oral">
+                            Ácido Fólico - 5 mg (Oral) - Desde: 10/10/2025
+                        </option>
+                        <option value="3" data-nombre="Calcio" data-dosis="500 mg" data-via="Oral">
+                            Calcio - 500 mg (Oral) - Desde: 12/10/2025
+                        </option>
+                    </select>
+                    <small class="form-text text-muted d-block mt-1">
+                        <i class="bi bi-info-circle"></i> Si selecciona un medicamento prescrito, los datos se autocompletarán automáticamente
+                    </small>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="row">
+                    <!-- Nombre del Medicamento -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_nombre_medicamento" class="form-label">
+                            <i class="bi bi-capsule"></i> Nombre del Medicamento 
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="nombre_medicamento" class="form-control" 
+                            placeholder="Ej: Paracetamol 500mg" required maxlength="100" 
+                            id="id_nombre_medicamento">
+                    </div>
+
+                    <!-- Dosis -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_dosis" class="form-label">
+                            <i class="bi bi-prescription-bottle"></i> Dosis o Cantidad
+                        </label>
+                        <input type="text" name="dosis" class="form-control" 
+                            placeholder="Ej: 1 tableta / 5ml / 10 UI" maxlength="100" 
+                            id="id_dosis">
+                        <small class="form-text text-muted">
+                            Ejemplo: 1 tableta, 5ml, 10 UI
+                        </small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Vía de Administración -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_via_administracion" class="form-label">
+                            <i class="bi bi-arrow-through-heart"></i> Vía de Administración 
+                            <span class="text-danger">*</span>
+                        </label>
+                        <select name="via_administracion" class="form-select" required id="id_via_administracion">
+                            <option value="" selected>---------</option>
+                            <option value="VO">Oral (VO)</option>
+                            <option value="IM">Intramuscular (IM)</option>
+                            <option value="IV">Intravenosa (IV)</option>
+                            <option value="TP">Tópica</option>
+                            <option value="OT">Otras</option>
+                        </select>
+                    </div>
+
+                    <!-- Fecha de Aplicación -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_fecha_aplicacion" class="form-label">
+                            <i class="bi bi-calendar"></i> Fecha de Aplicación 
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" name="fecha_aplicacion" class="form-control" required 
+                            id="id_fecha_aplicacion">
+                    </div>
+
+                    <!-- Hora de Aplicación -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_hora_aplicacion" class="form-label">
+                            <i class="bi bi-clock"></i> Hora de Aplicación 
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="time" name="hora_aplicacion" class="form-control" required 
+                            id="id_hora_aplicacion">
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="mb-3">
+                    <label for="id_observaciones" class="form-label">
+                        <i class="bi bi-journal-medical"></i> Observaciones Clínicas
+                    </label>
+                    <textarea name="observaciones" cols="40" rows="4" class="form-control" 
+                            placeholder="Ej: Paciente presentó náuseas leves tras administración. Se mantuvo en observación por 30 minutos." 
+                            id="id_observaciones"></textarea>
+                    <small class="form-text text-muted d-block mt-1">
+                        <i class="bi bi-info-circle"></i> Registre cualquier reacción, efecto adverso o situación relevante durante la administración
+                    </small>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Importante:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+                        <li>El tratamiento quedará registrado automáticamente en esta ficha obstétrica</li>
+                        <li>Si selecciona un medicamento prescrito, los datos se completarán automáticamente</li>
+                        <li>Asegúrese de verificar todos los datos antes de guardar</li>
+                    </ul>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="d-flex justify-content-between">
+                    <a href="#" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> 
+                        Registrar Tratamiento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Establecer fecha y hora actual por defecto
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const fechaInput = document.getElementById('id_fecha_aplicacion');
+        const horaInput = document.getElementById('id_hora_aplicacion');
+        
+        if (fechaInput && !fechaInput.value) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            fechaInput.value = `${year}-${month}-${day}`;
+        }
+        
+        if (horaInput && !horaInput.value) {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            horaInput.value = `${hours}:${minutes}`;
+        }
+    });
+    
+    // Autocompletar campos cuando se selecciona un medicamento prescrito
+    document.getElementById('id_medicamento_ficha').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (this.value) {
+            // Obtener datos del medicamento seleccionado
+            const nombreMedicamento = selectedOption.getAttribute('data-nombre');
+            const dosis = selectedOption.getAttribute('data-dosis');
+            const via = selectedOption.getAttribute('data-via');
+            
+            // Autocompletar campos
+            document.getElementById('id_nombre_medicamento').value = nombreMedicamento || '';
+            document.getElementById('id_dosis').value = dosis || '';
+            
+            // Seleccionar vía de administración
+            const viaSelect = document.getElementById('id_via_administracion');
+            const viaMap = {
+                'Oral': 'VO',
+                'Intramuscular': 'IM',
+                'Intravenosa': 'IV',
+                'Tópica': 'TP'
+            };
+            
+            if (via && viaMap[via]) {
+                viaSelect.value = viaMap[via];
+            }
+            
+            // Mostrar mensaje de confirmación
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <i class="bi bi-check-circle"></i>
+                <strong>Datos autocompletados:</strong> Los campos se han llenado con la información del medicamento prescrito.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const form = document.getElementById('formTratamiento');
+            form.insertBefore(alertDiv, form.firstChild);
+            
+            // Auto-cerrar después de 5 segundos
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        } else {
+            // Limpiar campos si se deselecciona
+            document.getElementById('id_nombre_medicamento').value = '';
+            document.getElementById('id_dosis').value = '';
+            document.getElementById('id_via_administracion').value = '';
+        }
+    });
+    
+    // Confirmar antes de enviar
+    document.getElementById('formTratamiento').addEventListener('submit', function(e) {
+        const medicamento = document.getElementById('id_nombre_medicamento').value;
+        if (!confirm(`¿Confirma el registro del tratamiento: ${medicamento}?`)) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+</body>
+</html>

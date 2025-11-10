@@ -1,0 +1,244 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Editar Ficha Obstétrica - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-warning">
+                <i class="bi bi-pencil-square"></i> Editar Ficha Obstétrica
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Información de la Ficha -->
+    <div class="card mb-4 border-warning">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="bi bi-file-medical"></i> Ficha N° {{ ficha.pk }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Paciente:</strong> {{ ficha.paciente.persona.Nombre }} {{ ficha.paciente.persona.Apellido_Paterno }}</p>
+                    <p><strong>RUT:</strong> {{ ficha.paciente.persona.Rut }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Creada:</strong> {{ ficha.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Matrona:</strong> {{ ficha.matrona_responsable.persona.Nombre }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Estado:</strong> 
+                        {% if ficha.activa %}
+                            <span class="badge bg-success">Activa</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Cerrada</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verificar si la ficha está activa -->
+    {% if not ficha.activa %}
+    <div class="alert alert-danger" role="alert">
+        <h5><i class="bi bi-exclamation-octagon"></i> Ficha Cerrada</h5>
+        <p>Esta ficha está cerrada y no se puede editar. Si necesita modificarla, contacte al administrador del sistema.</p>
+        <a href="{% url 'matrona:detalle_ficha' ficha.pk %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Detalle
+        </a>
+    </div>
+    {% else %}
+
+    <!-- Formulario de Edición -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-pencil"></i> Modificar Datos de la Ficha</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" id="formEditarFicha">
+                {% csrf_token %}
+                
+                <!-- Mostrar errores -->
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Corrija los siguientes errores:</h5>
+                    {{ form.errors }}
+                </div>
+                {% endif %}
+
+                <!-- Datos Obstétricos -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">📋 Información Obstétrica</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Edad Gestacional -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_edad_gestacional" class="form-label">
+                                    Edad Gestacional (semanas) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.edad_gestacional }}
+                                <small class="form-text text-muted">Actualizar según control actual</small>
+                            </div>
+
+                            <!-- Fecha Última Menstruación -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_fecha_ultima_menstruacion" class="form-label">
+                                    Fecha Última Menstruación (FUM) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.fecha_ultima_menstruacion }}
+                            </div>
+
+                            <!-- Fecha Probable Parto -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_fecha_probable_parto" class="form-label">
+                                    Fecha Probable de Parto (FPP) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.fecha_probable_parto }}
+                            </div>
+
+                            <!-- Grupo Sanguíneo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_grupo_sanguineo" class="form-label">
+                                    Grupo Sanguíneo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.grupo_sanguineo }}
+                            </div>
+
+                            <!-- Factor RH -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_factor_rh" class="form-label">
+                                    Factor RH <span class="text-danger">*</span>
+                                </label>
+                                {{ form.factor_rh }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Antecedentes Obstétricos -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">🤰 Antecedentes Obstétricos</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="id_numero_embarazos" class="form-label">N° Embarazos (G)</label>
+                                {{ form.numero_embarazos }}
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="id_partos" class="form-label">Partos (P)</label>
+                                {{ form.partos }}
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="id_cesareas" class="form-label">Cesáreas (C)</label>
+                                {{ form.cesareas }}
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="id_abortos" class="form-label">Abortos (A)</label>
+                                {{ form.abortos }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patologías -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">⚕️ Patologías Asociadas</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="id_patologias" class="form-label">
+                                    Patologías (selección múltiple)
+                                </label>
+                                {{ form.patologias }}
+                                <small class="form-text text-muted">
+                                    Mantenga presionado Ctrl (o Cmd en Mac) para seleccionar múltiples
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">📝 Observaciones</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="id_observaciones" class="form-label">
+                                    Observaciones Generales
+                                </label>
+                                {{ form.observaciones }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle"></i> Guardar Cambios
+                        </button>
+                        <a href="{% url 'matrona:detalle_ficha' ficha.pk %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Advertencia de Última Modificación -->
+    <div class="alert alert-info mt-4" role="alert">
+        <h6><i class="bi bi-info-circle"></i> Información</h6>
+        <ul class="mb-0">
+            <li>Última modificación: {{ ficha.fecha_actualizacion|date:"d/m/Y H:i" }}</li>
+            <li>Los cambios quedarán registrados en el historial de la ficha</li>
+            <li>No olvide guardar los cambios antes de salir</li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Recalcular FPP al cambiar FUM
+document.getElementById('id_fecha_ultima_menstruacion')?.addEventListener('change', function() {
+    const fum = new Date(this.value);
+    if (fum) {
+        const fpp = new Date(fum.getTime() + (280 * 24 * 60 * 60 * 1000));
+        const fppInput = document.getElementById('id_fecha_probable_parto');
+        if (fppInput) {
+            fppInput.value = fpp.toISOString().split('T')[0];
+        }
+    }
+});
+
+// Confirmación antes de guardar cambios
+document.getElementById('formEditarFicha')?.addEventListener('submit', function(e) {
+    const confirmacion = confirm('¿Está seguro de guardar los cambios en la ficha?');
+    if (!confirmacion) {
+        e.preventDefault();
+    }
+});
+
+console.log('✅ Formulario de editar ficha cargado');
+</script>
+{% endblock %}

@@ -1,0 +1,615 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Sistema Obstétrico Hospital Herminda Martín{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Animaciones */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .stat-card {
+        transition: all 0.3s ease;
+        animation: fadeInUp 1s ease-out;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important;
+    }
+    
+    .stat-card .stat-icon {
+        animation: pulse 2s infinite;
+    }
+    
+    .access-card {
+        transition: all 0.3s ease;
+        border-left: 5px solid transparent;
+    }
+    
+    .access-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .access-card.border-primary:hover {
+        border-left-color: #0d6efd;
+    }
+    
+    .access-card.border-danger:hover {
+        border-left-color: #dc3545;
+    }
+    
+    .access-card.border-warning:hover {
+        border-left-color: #ffc107;
+    }
+    
+    .btn-action {
+        transition: all 0.2s ease;
+    }
+    
+    .btn-action:hover {
+        transform: scale(1.05);
+    }
+    
+    .activity-item {
+        border-left: 3px solid #e9ecef;
+        padding-left: 1rem;
+        margin-left: 0.5rem;
+        transition: border-color 0.3s;
+    }
+    
+    .activity-item:hover {
+        border-left-color: #667eea;
+    }
+    
+    .team-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="hero-section text-white p-5 rounded-4 shadow-lg">
+                <div class="text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-hospital stat-icon" style="font-size: 5rem; opacity: 0.9;"></i>
+                    </div>
+                    <h1 class="display-3 fw-bold mb-3">Sistema de Trazabilidad Obstétrica</h1>
+                    <p class="lead fs-4 mb-2">Hospital Clínico Herminda Martín</p>
+                    <p class="fs-5 opacity-75">Chillán - Región de Ñuble</p>
+                    <hr class="my-4 border-white opacity-50" style="width: 50%; margin: 2rem auto;">
+                    <p class="fs-5 mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Gestión integral de pacientes obstétricos
+                        <span class="mx-3">|</span>
+                        <i class="bi bi-people-fill me-2"></i>
+                        Control de personal médico
+                        <span class="mx-3">|</span>
+                        <i class="bi bi-file-medical-fill me-2"></i>
+                        Trazabilidad completa
+                    </p>
+                    <div class="mt-4">
+                        <span class="badge bg-light text-dark px-4 py-2 fs-6 me-2">
+                            <i class="bi bi-calendar3"></i> {{ fecha_actual|date:"l, d F Y" }}
+                        </span>
+                        <span class="badge bg-light text-dark px-4 py-2 fs-6">
+                            <i class="bi bi-clock"></i> {{ fecha_actual|time:"H:i" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Principales -->
+    <div class="row mb-5">
+        <div class="col-12 mb-3">
+            <h2 class="fw-bold">
+                <i class="bi bi-bar-chart-fill text-primary"></i>
+                Estadísticas Generales
+            </h2>
+            <p class="text-muted">Resumen del estado actual del sistema</p>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card stat-card text-white bg-primary shadow border-0 h-100">
+                <div class="card-body text-center py-4">
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-people-fill" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2">{{ total_personas|default:0 }}</h2>
+                    <p class="fs-5 mb-0 opacity-90">Personas Registradas</p>
+                    <hr class="border-white opacity-50 my-3">
+                    <small class="opacity-75">
+                        <i class="bi bi-graph-up"></i> 
+                        Total en el sistema
+                    </small>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{% url 'gestion:lista_personas' %}" class="text-white text-decoration-none">
+                        Ver todas <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card stat-card text-white bg-danger shadow border-0 h-100">
+                <div class="card-body text-center py-4">
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-person-heart" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2">{{ total_pacientes|default:0 }}</h2>
+                    <p class="fs-5 mb-0 opacity-90">Pacientes Activos</p>
+                    <hr class="border-white opacity-50 my-3">
+                    <small class="opacity-75">
+                        <i class="bi bi-heart-pulse"></i> 
+                        En seguimiento
+                    </small>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{% url 'matrona:lista_pacientes' %}" class="text-white text-decoration-none">
+                        Ver todos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card stat-card text-white bg-success shadow border-0 h-100">
+                <div class="card-body text-center py-4">
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-door-open-fill" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2">{{ total_ingresos|default:0 }}</h2>
+                    <p class="fs-5 mb-0 opacity-90">Ingresos Hospitalarios</p>
+                    <hr class="border-white opacity-50 my-3">
+                    <small class="opacity-75">
+                        <i class="bi bi-calendar-check"></i> 
+                        Registros totales
+                    </small>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{% url 'matrona:registrar_ingreso' %}" class="text-white text-decoration-none">
+                        Nuevo ingreso <i class="bi bi-plus-circle"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="card stat-card text-dark bg-warning shadow border-0 h-100">
+                <div class="card-body text-center py-4">
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-file-medical-fill" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2">{{ total_patologias|default:0 }}</h2>
+                    <p class="fs-5 mb-0">Patologías Activas</p>
+                    <hr class="border-dark opacity-25 my-3">
+                    <small class="opacity-75">
+                        <i class="bi bi-journal-medical"></i> 
+                        En catálogo
+                    </small>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{% url 'medico:listar_patologias' %}" class="text-dark text-decoration-none">
+                        Ver catálogo <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal del Sistema -->
+    <div class="row mb-5">
+        <div class="col-12 mb-3">
+            <h2 class="fw-bold">
+                <i class="bi bi-people text-info"></i>
+                Personal del Hospital
+            </h2>
+            <p class="text-muted">Resumen del equipo médico registrado</p>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-clipboard-pulse text-primary" style="font-size: 2.5rem;"></i>
+                    <h3 class="mt-3 mb-2">{{ total_medicos|default:0 }}</h3>
+                    <p class="text-muted mb-0">Médicos</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-heart-pulse text-success" style="font-size: 2.5rem;"></i>
+                    <h3 class="mt-3 mb-2">{{ total_matronas|default:0 }}</h3>
+                    <p class="text-muted mb-0">Matronas</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-bandaid text-info" style="font-size: 2.5rem;"></i>
+                    <h3 class="mt-3 mb-2">{{ total_tens|default:0 }}</h3>
+                    <p class="text-muted mb-0">TENS</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill text-secondary" style="font-size: 2.5rem;"></i>
+                    <h3 class="mt-3 mb-2">{{ total_personal|default:0 }}</h3>
+                    <p class="text-muted mb-0">Total Personal</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="row mb-5">
+        <div class="col-12 mb-3">
+            <h2 class="fw-bold">
+                <i class="bi bi-lightning-charge-fill text-warning"></i>
+                Accesos Rápidos
+            </h2>
+            <p class="text-muted">Funcionalidades principales del sistema</p>
+        </div>
+        
+        <!-- Card: Gestión de Personal -->
+        <div class="col-lg-4 mb-4">
+            <div class="card access-card border-primary shadow-sm h-100">
+                <div class="card-header bg-primary bg-gradient text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people-fill"></i>
+                        Gestión de Personal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted mb-4">
+                        Registre y administre el personal médico y administrativo del hospital
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'gestion:registrar_persona' %}" class="btn btn-primary btn-action">
+                            <i class="bi bi-person-plus-fill"></i>
+                            Registrar Nueva Persona
+                        </a>
+                        <a href="{% url 'gestion:lista_personas' %}" class="btn btn-outline-primary btn-action">
+                            <i class="bi bi-list-ul"></i>
+                            Ver Lista de Personas
+                        </a>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-briefcase"></i>
+                        Asignar Roles
+                    </h6>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'gestion:registrar_medico' %}" class="btn btn-sm btn-outline-info btn-action">
+                            <i class="bi bi-clipboard-pulse"></i>
+                            Registrar Médico
+                        </a>
+                        <a href="{% url 'gestion:registrar_matrona' %}" class="btn btn-sm btn-outline-success btn-action">
+                            <i class="bi bi-heart-pulse"></i>
+                            Registrar Matrona
+                        </a>
+                        <a href="{% url 'gestion:registrar_tens' %}" class="btn btn-sm btn-outline-secondary btn-action">
+                            <i class="bi bi-bandaid"></i>
+                            Registrar TENS
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Primero registre la persona, luego asigne roles
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card: Gestión de Pacientes -->
+        <div class="col-lg-4 mb-4">
+            <div class="card access-card border-danger shadow-sm h-100">
+                <div class="card-header bg-danger bg-gradient text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-heart"></i>
+                        Gestión de Pacientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted mb-4">
+                        Administre pacientes obstétricos, ingresos hospitalarios y fichas clínicas
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'matrona:registrar_paciente' %}" class="btn btn-danger btn-action">
+                            <i class="bi bi-person-plus-fill"></i>
+                            Registrar Nueva Paciente
+                        </a>
+                        <a href="{% url 'matrona:lista_pacientes' %}" class="btn btn-outline-danger btn-action">
+                            <i class="bi bi-list-check"></i>
+                            Ver Lista de Pacientes
+                        </a>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <h6 class="text-danger mb-3">
+                        <i class="bi bi-hospital"></i>
+                        Gestión Hospitalaria
+                    </h6>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'matrona:registrar_ingreso' %}" class="btn btn-sm btn-outline-success btn-action">
+                            <i class="bi bi-door-open-fill"></i>
+                            Registrar Ingreso
+                        </a>
+                        <a href="{% url 'matrona:buscar_paciente' %}" class="btn btn-sm btn-outline-primary btn-action">
+                            <i class="bi bi-search"></i>
+                            Búsqueda Avanzada
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check"></i>
+                        Validación de edad: 12-60 años
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card: Catálogo Médico -->
+        <div class="col-lg-4 mb-4">
+            <div class="card access-card border-warning shadow-sm h-100">
+                <div class="card-header bg-warning bg-gradient">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-medical-fill"></i>
+                        Catálogo Médico
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted mb-4">
+                        Administre el catálogo de patologías obstétricas con códigos CIE-10
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'medico:registrar_patologia' %}" class="btn btn-warning btn-action">
+                            <i class="bi bi-plus-circle-fill"></i>
+                            Registrar Nueva Patología
+                        </a>
+                        <a href="{% url 'medico:listar_patologias' %}" class="btn btn-outline-warning btn-action">
+                            <i class="bi bi-journal-medical"></i>
+                            Ver Catálogo Completo
+                        </a>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <h6 class="text-warning mb-3">
+                        <i class="bi bi-graph-up"></i>
+                        Estadísticas
+                    </h6>
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="p-2 bg-light rounded">
+                                <h4 class="text-danger mb-0">{{ patologias_alto_riesgo|default:0 }}</h4>
+                                <small class="text-muted">Alto Riesgo</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 bg-light rounded">
+                                <h4 class="text-success mb-0">{{ patologias_bajo_riesgo|default:0 }}</h4>
+                                <small class="text-muted">Bajo Riesgo</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-tags"></i>
+                        Clasificación CIE-10
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-gradient" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i>
+                        Actividad Reciente del Sistema
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if actividades_recientes %}
+                        {% for actividad in actividades_recientes %}
+                        <div class="activity-item mb-3 pb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <div class="rounded-circle bg-primary bg-gradient text-white d-flex align-items-center justify-content-center" 
+                                        style="width: 40px; height: 40px;">
+                                        <i class="bi {{ actividad.icon }}"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ actividad.titulo }}</h6>
+                                    <p class="text-muted mb-1">{{ actividad.descripcion }}</p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i>
+                                        {{ actividad.fecha|timesince }} atrás
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3 mb-0">
+                            No hay actividades recientes registradas
+                        </p>
+                        <small class="text-muted">
+                            Las nuevas acciones aparecerán aquí
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información del Sistema -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-info bg-gradient text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle-fill"></i>
+                        Información del Sistema
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-info mb-3">
+                        <i class="bi bi-building"></i>
+                        Hospital Clínico Herminda Martín
+                    </h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt-fill text-danger"></i>
+                            <strong>Ubicación:</strong> Chillán, Ñuble
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-hospital text-primary"></i>
+                            <strong>Servicio:</strong> Obstetricia
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-calendar-check text-success"></i>
+                            <strong>Estado:</strong>
+                            <span class="badge bg-success">Operativo</span>
+                        </li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6 class="text-info mb-3">
+                        <i class="bi bi-gear-fill"></i>
+                        Versión del Sistema
+                    </h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-code-square text-secondary"></i>
+                            <strong>Versión:</strong> 1.0.0
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-calendar3 text-secondary"></i>
+                            <strong>Actualización:</strong> {{ fecha_actual|date:"m/Y" }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Acceso Rápido a Documentación -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary bg-gradient text-white">
+                    <h6 class="mb-0">
+                        <i class="bi bi-book"></i>
+                        Recursos
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                            <i class="bi bi-file-earmark-text"></i>
+                            Manual de Usuario
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                            <i class="bi bi-question-circle"></i>
+                            Ayuda
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2 text-center">
+                        Próximamente disponible
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Actualizar hora en tiempo real
+    function actualizarHora() {
+        const ahora = new Date();
+        const hora = ahora.toLocaleTimeString('es-CL', { 
+            hour: '2-digit', 
+            minute: '2-digit'
+        });
+        
+        const badgeHora = document.querySelector('.badge:last-child');
+        if (badgeHora) {
+            badgeHora.innerHTML = '<i class="bi bi-clock"></i> ' + hora;
+        }
+    }
+    
+    // Actualizar cada minuto
+    setInterval(actualizarHora, 60000);
+    
+    // Animación de entrada para las cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.stat-card, .access-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+</script>
+{% endblock %}

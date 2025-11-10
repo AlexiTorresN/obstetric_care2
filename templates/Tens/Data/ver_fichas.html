@@ -1,0 +1,104 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Info del Paciente -->
+    <div class="card shadow mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-person-circle"></i> Información del Paciente
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>RUT:</strong> {{ paciente.persona.Rut }}</p>
+                    <p class="mb-2"><strong>Nombre:</strong> 
+                        {{ paciente.persona.Nombre }} 
+                        {{ paciente.persona.Apellido_Paterno }} 
+                        {{ paciente.persona.Apellido_Materno }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>Edad:</strong> {{ paciente.Edad }} años</p>
+                    <p class="mb-2"><strong>Estado Civil:</strong> {{ paciente.get_Estado_civil_display }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fichas Obstétricas -->
+    <h3 class="mb-3">
+        <i class="bi bi-folder-fill text-warning"></i> Fichas Obstétricas
+    </h3>
+
+    {% if fichas %}
+        <div class="row">
+            {% for ficha in fichas %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm {% if ficha.activa %}border-success{% else %}border-secondary{% endif %}">
+                    <div class="card-header {% if ficha.activa %}bg-success text-white{% else %}bg-secondary text-white{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="bi bi-file-medical"></i> 
+                                Ficha: {{ ficha.numero_ficha }}
+                            </h6>
+                            {% if ficha.activa %}
+                                <span class="badge bg-light text-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-light text-secondary">Cerrada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2">
+                            <strong>Matrona:</strong> 
+                            {{ ficha.matrona_responsable.persona.Nombre }} 
+                            {{ ficha.matrona_responsable.persona.Apellido_Paterno }}
+                        </p>
+                        <p class="mb-2">
+                            <strong>Fecha Creación:</strong> 
+                            {{ ficha.fecha_creacion|date:"d/m/Y H:i" }}
+                        </p>
+                        <p class="mb-3">
+                            <strong>Medicamentos Asignados:</strong>
+                            <span class="badge bg-warning text-dark">{{ ficha.num_medicamentos }}</span>
+                        </p>
+                        
+                        <a href="{% url 'tens:detalle_ficha' ficha.pk %}" 
+                            class="btn btn-warning w-100">
+                            <i class="bi bi-eye"></i> Ver Medicamentos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            Este paciente no tiene fichas obstétricas registradas
+        </div>
+    {% endif %}
+
+    <!-- Botones -->
+    <div class="mt-4">
+        <a href="{% url 'tens:buscar_paciente' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Búsqueda
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-3px);
+    }
+</style>
+{% endblock %}

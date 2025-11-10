@@ -1,0 +1,152 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Agregar Medicamento - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">
+                <i class="bi bi-capsule"></i> Agregar Medicamento a la Ficha
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="card mb-4 border-info">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-person-circle"></i> Información del Paciente</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>RUT:</strong> {{ paciente.persona.Rut }}</p>
+                    <p><strong>Nombre:</strong> {{ paciente.persona.Nombre }} {{ paciente.persona.Apellido_Paterno }} {{ paciente.persona.Apellido_Materno }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Edad:</strong> {{ paciente.Edad }} años</p>
+                    <p><strong>Ficha N°:</strong> {{ ficha.pk }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Medicamento -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-file-medical"></i> Datos del Medicamento</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" id="formAgregarMedicamento">
+                {% csrf_token %}
+                
+                <!-- Renderizar errores si existen -->
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Errores en el formulario:</h5>
+                    {{ form.errors }}
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <!-- Nombre del Medicamento -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_nombre_medicamento" class="form-label">
+                            Medicamento <span class="text-danger">*</span>
+                        </label>
+                        {{ form.nombre_medicamento }}
+                        <small class="form-text text-muted">Seleccione el medicamento a prescribir</small>
+                    </div>
+
+                    <!-- Dosis -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_dosis" class="form-label">
+                            Dosis <span class="text-danger">*</span>
+                        </label>
+                        {{ form.dosis }}
+                        <small class="form-text text-muted">Cantidad por toma</small>
+                    </div>
+
+                    <!-- Vía de Administración -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_via_administracion" class="form-label">
+                            Vía de Administración <span class="text-danger">*</span>
+                        </label>
+                        {{ form.via_administracion }}
+                    </div>
+
+                    <!-- Frecuencia -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_frecuencia" class="form-label">
+                            Frecuencia <span class="text-danger">*</span>
+                        </label>
+                        {{ form.frecuencia }}
+                        <small class="form-text text-muted">Ej: Cada 8 horas</small>
+                    </div>
+
+                    <!-- Fecha Inicio -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_fecha_inicio" class="form-label">
+                            Fecha de Inicio <span class="text-danger">*</span>
+                        </label>
+                        {{ form.fecha_inicio }}
+                    </div>
+
+                    <!-- Fecha Término -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_fecha_termino" class="form-label">
+                            Fecha de Término <span class="text-danger">*</span>
+                        </label>
+                        {{ form.fecha_termino }}
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="col-12 mb-3">
+                        <label for="id_observaciones" class="form-label">
+                            Observaciones
+                        </label>
+                        {{ form.observaciones }}
+                        <small class="form-text text-muted">
+                            Indicaciones especiales, contraindicaciones, precauciones, etc.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> Agregar Medicamento
+                        </button>
+                        <a href="{% url 'matrona:detalle_ficha' ficha.pk %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación básica del formulario
+document.getElementById('formAgregarMedicamento').addEventListener('submit', function(e) {
+    const fechaInicio = document.getElementById('id_fecha_inicio').value;
+    const fechaTermino = document.getElementById('id_fecha_termino').value;
+    
+    // Validar que fecha término sea mayor a fecha inicio
+    if (fechaInicio && fechaTermino && new Date(fechaTermino) < new Date(fechaInicio)) {
+        e.preventDefault();
+        alert('❌ La fecha de término debe ser posterior a la fecha de inicio');
+        return false;
+    }
+});
+
+console.log('✅ Formulario de agregar medicamento cargado');
+</script>
+{% endblock %}

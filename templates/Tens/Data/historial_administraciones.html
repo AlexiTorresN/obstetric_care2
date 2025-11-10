@@ -1,0 +1,152 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Info del Paciente -->
+    <div class="card shadow mb-4 border-info">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-person-circle"></i> 
+                Paciente: {{ paciente.persona.Nombre }} {{ paciente.persona.Apellido_Paterno }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>RUT:</strong> {{ paciente.persona.Rut }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>Ficha:</strong> {{ ficha.numero_ficha }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-0"><strong>Total Administraciones:</strong> {{ administraciones.count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial -->
+    <h3 class="mb-3">
+        <i class="bi bi-clock-history text-info"></i> Historial Completo de Administraciones
+    </h3>
+
+    {% if administraciones %}
+        <div class="card shadow">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Medicamento</th>
+                                <th>TENS</th>
+                                <th>Lavado</th>
+                                <th>Estado</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin in administraciones %}
+                            <tr>
+                                <td>
+                                    <strong>{{ admin.fecha_hora_administracion|date:"d/m/Y" }}</strong><br>
+                                    <small class="text-muted">{{ admin.fecha_hora_administracion|date:"H:i" }} hrs</small>
+                                </td>
+                                <td>
+                                    <strong>{{ admin.medicamento_ficha.nombre_medicamento }}</strong><br>
+                                    <small class="text-muted">{{ admin.medicamento_ficha.dosis }}</small>
+                                </td>
+                                <td>
+                                    {{ admin.tens.persona.Nombre }} {{ admin.tens.persona.Apellido_Paterno }}
+                                </td>
+                                <td class="text-center">
+                                    {% if admin.se_realizo_lavado %}
+                                        <span class="badge bg-info">✓ Sí</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">✗ No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if admin.administrado_exitosamente %}
+                                        <span class="badge bg-success">Exitoso</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">No administrado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if admin.observaciones %}
+                                        <button class="btn btn-sm btn-outline-info" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modal{{ admin.pk }}">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </button>
+                                        
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="modal{{ admin.pk }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Detalles de Administración</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p><strong>Medicamento:</strong> {{ admin.medicamento_ficha.nombre_medicamento }}</p>
+                                                        <p><strong>Fecha/Hora:</strong> {{ admin.fecha_hora_administracion|date:"d/m/Y H:i" }}</p>
+                                                        <hr>
+                                                        <p><strong>Observaciones:</strong></p>
+                                                        <p>{{ admin.observaciones }}</p>
+                                                        
+                                                        {% if admin.reacciones_adversas %}
+                                                        <hr>
+                                                        <p><strong>Reacciones Adversas:</strong></p>
+                                                        <p class="text-danger">{{ admin.reacciones_adversas }}</p>
+                                                        {% endif %}
+                                                        
+                                                        {% if not admin.administrado_exitosamente and admin.motivo_no_administracion %}
+                                                        <hr>
+                                                        <p><strong>Motivo de No Administración:</strong></p>
+                                                        <p class="text-warning">{{ admin.motivo_no_administracion }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">Sin observaciones</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            No hay administraciones registradas en esta ficha
+        </div>
+    {% endif %}
+
+    <!-- Botones -->
+    <div class="mt-4">
+        <a href="{% url 'tens:detalle_ficha' ficha.pk %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Ficha
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'Shared/base.html' %}
+
+{% block title %}{% if patologia.estado == 'Activo' %}Desactivar{% else %}Activar{% endif %} Patología{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow {% if patologia.estado == 'Activo' %}border-warning{% else %}border-success{% endif %}">
+                <div class="card-header {% if patologia.estado == 'Activo' %}bg-warning text-dark{% else %}bg-success text-white{% endif %}">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Confirmar Acción
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {% if patologia.estado == 'Activo' %}
+                            ¿Desactivar esta patología?
+                        {% else %}
+                            ¿Activar esta patología?
+                        {% endif %}
+                    </h5>
+                    
+                    <!-- Información de la patología -->
+                    <div class="alert {% if patologia.estado == 'Activo' %}alert-warning{% else %}alert-success{% endif %} mt-3">
+                        <h6><i class="fas fa-info-circle"></i> Datos de la patología:</h6>
+                        <hr>
+                        <p class="mb-2">
+                            <strong>Nombre:</strong> {{ patologia.nombre }}
+                        </p>
+                        <p class="mb-2">
+                            <strong>Código CIE-10:</strong> 
+                            <span class="badge bg-info text-dark">
+                                {{ patologia.get_codigo_cie_10_display }}
+                            </span>
+                        </p>
+                        <p class="mb-2">
+                            <strong>Nivel de Riesgo:</strong> 
+                            {% if patologia.nivel_de_riesgo == 'Bajo' %}
+                                <span class="badge bg-success">Bajo</span>
+                            {% elif patologia.nivel_de_riesgo == 'Medio' %}
+                                <span class="badge bg-warning text-dark">Medio</span>
+                            {% elif patologia.nivel_de_riesgo == 'Alto' %}
+                                <span class="badge bg-danger">Alto</span>
+                            {% else %}
+                                <span class="badge bg-dark">Crítico</span>
+                            {% endif %}
+                        </p>
+                        <p class="mb-0">
+                            <strong>Estado actual:</strong> 
+                            {% if patologia.estado == 'Activo' %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Mensaje informativo -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Nota:</strong>
+                        {% if patologia.estado == 'Activo' %}
+                            Al desactivar esta patología, <strong>no estará disponible</strong> para ser asignada a nuevas pacientes.
+                        {% else %}
+                            Al activar esta patología, estará <strong>disponible nuevamente</strong> para ser asignada a pacientes.
+                        {% endif %}
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" 
+                                    class="btn {% if patologia.estado == 'Activo' %}btn-warning{% else %}btn-success{% endif %}">
+                                <i class="fas fa-check-circle"></i> 
+                                Sí, {% if patologia.estado == 'Activo' %}Desactivar{% else %}Activar{% endif %}
+                            </button>
+                            <a href="{% url 'medico:listar_patologias' %}" class="btn btn-secondary">
+                                <i class="fas fa-times-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

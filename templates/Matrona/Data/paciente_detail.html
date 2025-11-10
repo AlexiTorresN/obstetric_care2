@@ -1,0 +1,141 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Detalle del Paciente - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow">
+    <!-- Header con badge y botón -->
+    <div class="card-header bg-danger text-white">
+      <h4 class="mb-0 d-flex align-items-center gap-2 w-100">
+        <i class="bi bi-person-badge"></i> Ficha del Paciente
+
+        {% if legacy_total and legacy_total|add:0 > 0 %}
+          <span class="badge bg-light text-danger ms-2" title="Controles previos en base histórica">
+            {{ legacy_total }} controles
+          </span>
+          <a class="btn btn-light btn-sm ms-auto"
+             data-bs-toggle="collapse" href="#historialLegacy" role="button" aria-expanded="false"
+             aria-controls="historialLegacy">
+            <i class="bi bi-clipboard2-pulse"></i> Ver controles previos
+          </a>
+        {% endif %}
+      </h4>
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+        <!-- Datos Personales -->
+        <div class="col-md-6 mb-3">
+          <h5 class="text-danger border-bottom pb-2">Datos Personales</h5>
+          <p>
+            <strong>RUT:</strong> {{ paciente.persona.Rut }}
+            {% if legacy_total and legacy_total|add:0 > 0 %}
+              <span class="badge bg-danger ms-2">Historial previo</span>
+            {% endif %}
+          </p>
+          <!-- ✅ CORREGIDO: Apellido_Paterno y Apellido_Materno -->
+          <p>
+            <strong>Nombre Completo:</strong> 
+            {{ paciente.persona.Nombre }} 
+            {{ paciente.persona.Apellido_Paterno }} 
+            {{ paciente.persona.Apellido_Materno }}
+          </p>
+          <p><strong>Sexo:</strong> {{ paciente.persona.Sexo }}</p>
+          <p><strong>Fecha Nacimiento:</strong> {{ paciente.persona.Fecha_nacimiento|date:"d/m/Y" }}</p>
+          <p><strong>Teléfono:</strong> {{ paciente.persona.Telefono|default:"No registrado" }}</p>
+          <p><strong>Email:</strong> {{ paciente.persona.Email|default:"No registrado" }}</p>
+          <p><strong>Dirección:</strong> {{ paciente.persona.Direccion|default:"No registrada" }}</p>
+        </div>
+
+        <!-- Datos del Paciente -->
+        <div class="col-md-6 mb-3">
+          <h5 class="text-danger border-bottom pb-2">Datos Obstétricos</h5>
+          <p><strong>Edad:</strong> {{ paciente.Edad }} años</p>
+          <p><strong>Estado Civil:</strong> {{ paciente.get_Estado_civil_display }}</p>
+          <p><strong>Previsión:</strong> {{ paciente.get_Previcion_display }}</p>
+          <p><strong>Acompañante:</strong> {{ paciente.Acompañante|default:"No registrado" }}</p>
+          <p><strong>Contacto Emergencia:</strong> {{ paciente.Contacto_emergencia|default:"No registrado" }}</p>
+          <p><strong>Fecha Registro:</strong> {{ paciente.fecha_creacion|date:"d/m/Y H:i" }}</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>Nota:</strong> Para agregar ingresos, patologías y tratamientos, utilice las opciones del menú de matrona.
+      </div>
+    </div>
+
+    <!-- Panel de Controles Previos (Legacy) -->
+    {% if legacy_total and legacy_total|add:0 > 0 %}
+    <div class="collapse mt-3" id="historialLegacy">
+      <div class="card card-body bg-light">
+        <h5 class="text-secondary mb-3">
+          <i class="bi bi-file-medical-fill"></i> Controles de Rutina Previos (LEGACY)
+        </h5>
+        
+        {% if controles_legacy %}
+          <!-- Selector de control -->
+          <div class="mb-3">
+            <label class="form-label">Seleccionar control:</label>
+            <div class="btn-group" role="group">
+              {% for ctrl in controles_legacy %}
+                <a href="?ctrl={{ ctrl.id }}" 
+                   class="btn {% if control_seleccionado.id == ctrl.id %}btn-danger{% else %}btn-outline-danger{% endif %} btn-sm">
+                  {{ ctrl.fecha_control|date:"d/m/Y" }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Detalle del control seleccionado -->
+          {% if control_seleccionado %}
+            <div class="card">
+              <div class="card-header bg-danger text-white">
+                <strong>Control del {{ control_seleccionado.fecha_control|date:"d/m/Y" }}</strong>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Presión Arterial:</strong> {{ control_seleccionado.presion_arterial }}</p>
+                    <p><strong>Peso:</strong> {{ control_seleccionado.peso }} kg</p>
+                    <p><strong>Altura Uterina:</strong> {{ control_seleccionado.altura_uterina }} cm</p>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Observaciones:</strong> {{ control_seleccionado.observaciones|default:"Sin observaciones" }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <p class="text-muted">No hay controles previos registrados.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones de Navegación -->
+    <div class="card-footer d-flex justify-content-between">
+      <a href="{% url 'matrona:lista_pacientes' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a Lista
+      </a>
+      <div>
+        <a href="{% url 'matrona:seleccionar_paciente_ficha' %}?q={{ paciente.persona.Rut }}" 
+           class="btn btn-success">
+          <i class="bi bi-file-earmark-medical"></i> Crear Ficha Obstétrica
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Vista de detalle de paciente cargada');
+</script>
+{% endblock %}

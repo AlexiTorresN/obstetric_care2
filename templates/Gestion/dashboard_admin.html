@@ -1,0 +1,384 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Administrativo - Sistema Obstétrico{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Navbar Principal -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient shadow-sm mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-hospital"></i> Sistema Obstétrico
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-people"></i> Gestión
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person-plus"></i> Nueva Persona</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-list-ul"></i> Ver Todas</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-shield-check"></i> Gestionar Roles</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-file-earmark-medical"></i> Partos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Reportes</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> Admin
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Configuración</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history"></i> Auditoría</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    <!-- Header con saludo -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-card p-4 rounded-3 shadow-sm">
+                <h2 class="mb-2"><i class="bi bi-emoji-smile"></i> Bienvenido, Administrador</h2>
+                <p class="text-muted mb-0">Panel de control del sistema obstétrico - Vista general de roles y estadísticas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Roles -->
+    <div class="row g-4 mb-4">
+        <!-- ROL: MÉDICOS -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card role-card role-medico h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="role-icon bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-capsule-pill text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <span class="badge bg-primary">Activos</span>
+                    </div>
+                    <h3 class="fw-bold text-primary mb-1">{{ total_medicos|default:2 }}</h3>
+                    <h5 class="card-title mb-2">Médicos</h5>
+                    <p class="text-muted small mb-3">Personal médico especializado</p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-primary btn-sm flex-fill">
+                            <i class="bi bi-eye"></i> Ver Lista
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <small class="text-muted">
+                        <i class="bi bi-clock-history"></i> Último registro: Hoy
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROL: MATRONAS -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card role-card role-matrona h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="role-icon bg-pink bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-heart-pulse-fill text-pink" style="font-size: 2rem;"></i>
+                        </div>
+                        <span class="badge bg-pink">Activas</span>
+                    </div>
+                    <h3 class="fw-bold text-pink mb-1">{{ total_matronas|default:2 }}</h3>
+                    <h5 class="card-title mb-2">Matronas</h5>
+                    <p class="text-muted small mb-3">Especialistas en obstetricia</p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-pink btn-sm flex-fill">
+                            <i class="bi bi-eye"></i> Ver Lista
+                        </a>
+                        <a href="#" class="btn btn-outline-pink btn-sm">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <small class="text-muted">
+                        <i class="bi bi-clock-history"></i> Último registro: Hoy
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROL: TENS -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card role-card role-tens h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="role-icon bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-bandaid-fill text-success" style="font-size: 2rem;"></i>
+                        </div>
+                        <span class="badge bg-success">Activos</span>
+                    </div>
+                    <h3 class="fw-bold text-success mb-1">{{ total_tens|default:2 }}</h3>
+                    <h5 class="card-title mb-2">TENS</h5>
+                    <p class="text-muted small mb-3">Técnicos de enfermería</p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-success btn-sm flex-fill">
+                            <i class="bi bi-eye"></i> Ver Lista
+                        </a>
+                        <a href="#" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <small class="text-muted">
+                        <i class="bi bi-clock-history"></i> Último registro: Hoy
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROL: PACIENTES -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card role-card role-paciente h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="role-icon bg-danger bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-person-hearts text-danger" style="font-size: 2rem;"></i>
+                        </div>
+                        <span class="badge bg-danger">Activos</span>
+                    </div>
+                    <h3 class="fw-bold text-danger mb-1">{{ total_pacientes|default:4 }}</h3>
+                    <h5 class="card-title mb-2">Pacientes</h5>
+                    <p class="text-muted small mb-3">Pacientes registrados</p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-danger btn-sm flex-fill">
+                            <i class="bi bi-eye"></i> Ver Lista
+                        </a>
+                        <a href="#" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <small class="text-muted">
+                        <i class="bi bi-clock-history"></i> Último registro: Hoy
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Estadísticas y Acciones Rápidas -->
+    <div class="row g-4">
+        <!-- Estadísticas -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> Resumen de Actividad</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="stat-box p-3 rounded bg-light">
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-file-earmark-medical text-info fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-0 fw-bold">24</h4>
+                                        <small class="text-muted">Partos este mes</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box p-3 rounded bg-light">
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-calendar-check text-warning fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-0 fw-bold">12</h4>
+                                        <small class="text-muted">Citas hoy</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box p-3 rounded bg-light">
+                                <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-people text-success fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-0 fw-bold">{{ total_usuarios|default:10 }}</h4>
+                                        <small class="text-muted">Total usuarios</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Distribución de roles -->
+                    <h6 class="mb-3">Distribución de Roles</h6>
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 20%">
+                                    Médicos
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-pink" role="progressbar" style="width: 20%">
+                                    Matronas
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 20%">
+                                    TENS
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 40%">
+                                    Pacientes
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-lightning-fill"></i> Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action border-0 rounded mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
+                                    <i class="bi bi-person-plus-fill text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Registrar Nueva Persona</h6>
+                                    <small class="text-muted">Agregar al sistema</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action border-0 rounded mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-pink bg-opacity-10 rounded p-2 me-3">
+                                    <i class="bi bi-file-earmark-plus text-pink"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Nuevo Registro de Parto</h6>
+                                    <small class="text-muted">Ingresar ficha</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action border-0 rounded mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 rounded p-2 me-3">
+                                    <i class="bi bi-shield-check text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Gestionar Roles</h6>
+                                    <small class="text-muted">Asignar permisos</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action border-0 rounded mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-info bg-opacity-10 rounded p-2 me-3">
+                                    <i class="bi bi-graph-up text-info"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Ver Reportes</h6>
+                                    <small class="text-muted">Estadísticas y análisis</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action border-0 rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning bg-opacity-10 rounded p-2 me-3">
+                                    <i class="bi bi-clock-history text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Auditoría del Sistema</h6>
+                                    <small class="text-muted">Ver registros</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer del dashboard -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="alert alert-light border text-center">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle"></i> 
+                    Sistema Obstétrico v1.0 - Desarrollado con Django y Bootstrap
+                    <span class="mx-2">|</span>
+                    <i class="bi bi-calendar-date"></i> {{ fecha_actual|default:"08/11/2025" }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animaciones y efectos
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Dashboard cargado correctamente');
+    
+    // Efecto hover en las cards
+    const roleCards = document.querySelectorAll('.role-card');
+    roleCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

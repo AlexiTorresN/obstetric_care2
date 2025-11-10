@@ -1,0 +1,256 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Gestionar Patologías - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">
+                <i class="bi bi-clipboard2-pulse"></i> Gestión de Patologías
+            </h2>
+            <p class="text-muted">Administrar patologías disponibles en el sistema</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Botones de Acción Superior -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{% url 'medico:crear_patologia' %}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Nueva Patología
+            </a>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalFiltros">
+                <i class="bi bi-funnel"></i> Filtros
+            </button>
+        </div>
+    </div>
+
+    <!-- Búsqueda Rápida -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="" class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" 
+                           class="form-control form-control-lg" 
+                           name="q" 
+                           value="{{ query }}"
+                           placeholder="Buscar patología por nombre o código CIE-10"
+                           autofocus>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h6 class="text-success">Patologías Activas</h6>
+                    <h2 class="text-success">{{ patologias_activas }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-secondary">
+                <div class="card-body">
+                    <h6 class="text-secondary">Patologías Inactivas</h6>
+                    <h2 class="text-secondary">{{ patologias_inactivas }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <h6 class="text-primary">Total Patologías</h6>
+                    <h2 class="text-primary">{{ patologias.count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Patologías -->
+    {% if patologias %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-list-ul"></i> Listado de Patologías ({{ patologias.count }})
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Código CIE-10</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Usos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patologia in patologias %}
+                        <tr>
+                            <td><strong>#{{ patologia.pk }}</strong></td>
+                            <td><code>{{ patologia.codigo_cie10 }}</code></td>
+                            <td>{{ patologia.nombre }}</td>
+                            <td>{{ patologia.descripcion|truncatewords:10 }}</td>
+                            <td>
+                                {% if patologia.activo %}
+                                    <span class="badge bg-success">Activa</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactiva</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ patologia.fichas_asociadas|default:0 }} ficha(s)
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'medico:detalle_patologia' patologia.pk %}" 
+                                       class="btn btn-sm btn-info"
+                                       title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if patologia.activo %}
+                                        <a href="{% url 'medico:desactivar_patologia' patologia.pk %}" 
+                                           class="btn btn-sm btn-warning"
+                                           title="Desactivar">
+                                            <i class="bi bi-pause-circle"></i>
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'medico:activar_patologia' patologia.pk %}" 
+                                           class="btn btn-sm btn-success"
+                                           title="Activar">
+                                            <i class="bi bi-play-circle"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">Primera</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Sin Patologías -->
+    <div class="alert alert-warning" role="alert">
+        <h5><i class="bi bi-info-circle"></i> Sin Patologías</h5>
+        <p>No se encontraron patologías en el sistema.</p>
+        <a href="{% url 'medico:crear_patologia' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Crear Primera Patología
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Información -->
+    <div class="alert alert-info mt-4" role="alert">
+        <h6><i class="bi bi-info-circle"></i> Información sobre Patologías</h6>
+        <ul class="mb-0">
+            <li>Las patologías se basan en la clasificación CIE-10</li>
+            <li>Solo las patologías activas aparecen en los formularios de fichas</li>
+            <li>No se pueden eliminar patologías asociadas a fichas obstétricas</li>
+            <li>La desactivación de una patología no afecta fichas existentes</li>
+        </ul>
+    </div>
+
+    <!-- Botón Volver -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'medico:menu_medico' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al Menú
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Filtros -->
+<div class="modal fade" id="modalFiltros" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-funnel"></i> Filtrar Patologías</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="get">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select class="form-select" name="estado">
+                            <option value="">Todas</option>
+                            <option value="activas">Solo Activas</option>
+                            <option value="inactivas">Solo Inactivas</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ordenar por</label>
+                        <select class="form-select" name="orden">
+                            <option value="nombre">Nombre</option>
+                            <option value="codigo">Código CIE-10</option>
+                            <option value="usos">Más utilizadas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+console.log('✅ Gestión de patologías cargada');
+console.log('Total patologías: {{ patologias.count }}');
+</script>
+{% endblock %}

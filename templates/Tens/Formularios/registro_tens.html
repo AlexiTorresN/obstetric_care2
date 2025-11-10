@@ -1,0 +1,284 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Registro TENS - Signos Vitales{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro TENS - Signos Vitales</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <h2 class="mb-4">
+            <i class="bi bi-clipboard2-pulse-fill text-success"></i>
+            Registro de Signos Vitales - TENS
+        </h2>
+        <!-- Búsqueda -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-search"></i> Buscar Paciente por RUT</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row align-items-center">
+                        <div class="col-md-8 mb-0">
+                            {{ buscar_form.as_p }}
+                        </div>
+                        <div class="col-md-4 d-flex justify-content-start align-items-center gap-2">
+                            <button type="submit" name="buscar_paciente" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                            {% if ficha %}
+                            <button type="submit" name="limpiar" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Limpiar
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if ficha %}
+        <!-- Información de la Ficha -->
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-file-medical-fill"></i> Ficha Obstétrica: {{ ficha.numero_ficha }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Datos del Paciente -->
+                    <div class="col-md-4">
+                        <h6 class="text-primary border-bottom pb-2">Datos del Paciente</h6>
+                        <p class="mb-1"><strong>Nombre:</strong> {{ ficha.paciente.persona.Nombre }} {{ ficha.paciente.persona.Apellido_Paterno }} {{ ficha.paciente.persona.Apellido_Materno }}</p>
+                        <p class="mb-1"><strong>RUT:</strong> {{ ficha.paciente.persona.Rut }}</p>
+                        <p class="mb-1"><strong>Edad:</strong> {{ ficha.paciente.Edad|default:"N/A" }} años</p>
+                        <p class="mb-1"><strong>Nacionalidad:</strong> {{ ficha.get_nacionalidad_display }}</p>
+                        <p class="mb-1"><strong>Previsión:</strong> {{ ficha.paciente.Previcion|default:"N/A" }}</p>
+                        {% if ficha.nombre_acompanante %}
+                        <p class="mb-1"><strong>Acompañante:</strong> {{ ficha.nombre_acompanante }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Datos Obstétricos -->
+                    <div class="col-md-4">
+                        <h6 class="text-primary border-bottom pb-2">Datos Obstétricos</h6>
+                        <p class="mb-1"><strong>Edad Gestacional:</strong> {{ ficha.edad_gestacional_semanas|default:"-" }} semanas {{ ficha.edad_gestacional_dias|default:"" }} días</p>
+                        <p class="mb-1"><strong>FUR:</strong> {{ ficha.fecha_ultima_regla|date:"d/m/Y"|default:"No registrada" }}</p>
+                        <p class="mb-1"><strong>FPP:</strong> {{ ficha.fecha_probable_parto|date:"d/m/Y"|default:"No registrada" }}</p>
+
+                    </div>
+                    
+                    <!-- Datos Antropométricos -->
+                    <div class="col-md-4">
+                        <h6 class="text-primary border-bottom pb-2">Datos Antropométricos</h6>
+                        <p class="mb-1"><strong>Peso Actual:</strong> {{ ficha.peso_actual|default:"N/A" }} kg</p>
+                        <p class="mb-1"><strong>Talla:</strong> {{ ficha.talla|default:"N/A" }} cm</p>
+                        <p class="mb-1"><strong>IMC:</strong> {{ ficha.imc|floatformat:2|default:"N/A" }}</p>
+                        <p class="mb-1"><strong>Matrona Responsable:</strong> {{ ficha.matrona_responsable.persona.Nombre }} {{ ficha.matrona_responsable.persona.Apellido_Paterno }}</p>
+                    </div>
+                </div>
+                
+                {% if ficha.patologias.exists %}
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-primary">Patologías Asociadas</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for patologia in ficha.patologias.all %}
+                            <span class="badge bg-warning text-dark">{{ patologia.nombre }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Formulario de Registro -->
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-heart-pulse-fill"></i> Registrar Signos Vitales</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ registro_form.ficha }}
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label"><strong>TENS Responsable</strong> <span class="text-danger">*</span></label>
+                            {{ registro_form.tens_responsable }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Fecha de Registro<span class="text-danger">*</span></label>
+                            {{ registro_form.fecha }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label"><strong>Turno</strong> <span class="text-danger">*</span></label>
+                            {{ registro_form.turno }}
+                        </div>
+                    </div>
+                    
+                    <h6 class="text-primary mt-3 mb-3">Signos Vitales</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Temperatura (°C)<span class="text-danger">*</span></label>
+                            {{ registro_form.temperatura }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Frecuencia Cardíaca (lpm)<span class="text-danger">*</span></label>
+                            {{ registro_form.frecuencia_cardiaca }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Presión Arterial (mmHg)<span class="text-danger">*</span></label>
+                            {{ registro_form.presion_arterial }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Frecuencia Respiratoria (rpm)<span class="text-danger">*</span></label>
+                            {{ registro_form.frecuencia_respiratoria }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Saturación de Oxígeno (%)<span class="text-danger">*</span></label>
+                            {{ registro_form.saturacion_oxigeno }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Observaciones</label>
+                            {{ registro_form.observaciones }}
+                        </div>
+                    </div>
+                    
+                    <button type="submit" name="guardar_registro" class="btn btn-success btn-lg w-100">
+                        <i class="bi bi-save-fill"></i> Guardar Registro
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Historial -->
+        {% if ultimos_registros %}
+        <div class="card">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimos Registros ({{ ultimos_registros|length }})</h5>
+                <span class="badge bg-light text-dark">Total: {{ ultimos_registros|length }} registros</span>
+            </div>
+            <div class="card-body">
+                {% for registro in ultimos_registros %}
+                <div class="card mb-3 border-start border-4 {% if registro.turno == 'manana' %}border-warning{% else %}border-info{% endif %}">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-calendar3"></i> {{ registro.fecha|date:"l, d \d\e F \d\e Y"|capfirst }}
+                                            {% if registro.turno == 'manana' %}
+                                            <span class="badge bg-warning text-dark ms-2">☀️ Turno Mañana</span>
+                                            {% elif registro.turno == 'tarde' %}
+                                            <span class="badge bg-info ms-2">🌤️ Turno Tarde</span>
+                                            {% endif %}
+                                        </h6>
+                                        <small class="text-muted">
+                                            <i class="bi bi-person-badge"></i> TENS: 
+                                            {% if registro.tens_responsable %}
+                                                <strong>{{ registro.tens_responsable.persona.Nombre }} {{ registro.tens_responsable.persona.Apellido_Paterno }}</strong>
+                                            {% else %}
+                                                <span class="text-warning">No registrado</span>
+                                            {% endif %}
+                                            | Registrado: {{ registro.fecha_registro|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-2">
+                        
+                        <div class="row g-3">
+                            <!-- Temperatura -->
+                            <div class="col-md-2 col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <i class="bi bi-thermometer-half text-danger fs-4"></i>
+                                    <p class="mb-0 mt-2 small text-muted">Temperatura</p>
+                                    <h5 class="mb-0">{{ registro.temperatura|default:"-" }}</h5>
+                                    <small class="text-muted">°C</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Frecuencia Cardíaca -->
+                            <div class="col-md-2 col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <i class="bi bi-heart-pulse text-danger fs-4"></i>
+                                    <p class="mb-0 mt-2 small text-muted">Freq. Cardíaca</p>
+                                    <h5 class="mb-0">{{ registro.frecuencia_cardiaca|default:"-" }}</h5>
+                                    <small class="text-muted">lpm</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Presión Arterial -->
+                            <div class="col-md-2 col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <i class="bi bi-activity text-primary fs-4"></i>
+                                    <p class="mb-0 mt-2 small text-muted">Presión Arterial</p>
+                                    <h5 class="mb-0">{{ registro.presion_arterial|default:"-" }}</h5>
+                                    <small class="text-muted">mmHg</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Frecuencia Respiratoria -->
+                            <div class="col-md-2 col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <i class="bi bi-wind text-info fs-4"></i>
+                                    <p class="mb-0 mt-2 small text-muted">Freq. Respiratoria</p>
+                                    <h5 class="mb-0">{{ registro.frecuencia_respiratoria|default:"-" }}</h5>
+                                    <small class="text-muted">rpm</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Saturación -->
+                            <div class="col-md-2 col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <i class="bi bi-lungs text-success fs-4"></i>
+                                    <p class="mb-0 mt-2 small text-muted">Sat. Oxígeno</p>
+                                    <h5 class="mb-0">{{ registro.saturacion_oxigeno|default:"-" }}</h5>
+                                    <small class="text-muted">%</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Observaciones -->
+                            {% if registro.observaciones %}
+                            <div class="col-md-12">
+                                <div class="alert alert-secondary mb-0">
+                                    <i class="bi bi-journal-text"></i> <strong>Observaciones:</strong><br>
+                                    {{ registro.observaciones }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

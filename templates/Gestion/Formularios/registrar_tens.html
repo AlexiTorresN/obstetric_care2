@@ -1,0 +1,127 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Registrar TENS - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="bi bi-bandaid-fill"></i> Registrar TENS
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Importante:</strong> La persona debe estar registrada previamente. 
+                        Ingrese el RUT para buscar y vincular.
+                    </div>
+                    
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- RUT de la Persona -->
+                        <div class="mb-3">
+                            <label for="{{ form.rut_persona.id_for_label }}" class="form-label">
+                                {{ form.rut_persona.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.rut_persona }}
+                            {% if form.rut_persona.errors %}
+                                <div class="text-danger small">{{ form.rut_persona.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">{{ form.rut_persona.help_text }}</small>
+                        </div>
+                        
+                        <!-- Contenedor para información de persona -->
+                        <div id="persona-info"></div>
+                        
+                        <hr>
+                        
+                        <!-- Nivel de Certificación -->
+                        <div class="mb-3">
+                            <label for="{{ form.Nivel_certificacion.id_for_label }}" class="form-label">
+                                Nivel de Certificación <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Nivel_certificacion }}
+                            {% if form.Nivel_certificacion.errors %}
+                                <div class="text-danger small">{{ form.Nivel_certificacion.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Institución Certificadora -->
+                        <div class="mb-3">
+                            <label for="{{ form.Institucion_certificadora.id_for_label }}" class="form-label">
+                                Institución Certificadora <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Institucion_certificadora }}
+                            {% if form.Institucion_certificadora.errors %}
+                                <div class="text-danger small">{{ form.Institucion_certificadora.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Fecha de Certificación -->
+                        <div class="mb-3">
+                            <label for="{{ form.Fecha_certificacion.id_for_label }}" class="form-label">
+                                Fecha de Certificación <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Fecha_certificacion }}
+                            {% if form.Fecha_certificacion.errors %}
+                                <div class="text-danger small">{{ form.Fecha_certificacion.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Años de Experiencia -->
+                        <div class="mb-3">
+                            <label for="{{ form.Anos_experiencia.id_for_label }}" class="form-label">
+                                Años de Experiencia <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Anos_experiencia }}
+                            {% if form.Anos_experiencia.errors %}
+                                <div class="text-danger small">{{ form.Anos_experiencia.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Turno -->
+                        <div class="mb-3">
+                            <label for="{{ form.Turno.id_for_label }}" class="form-label">
+                                Turno <span class="text-danger">*</span>
+                            </label>
+                            {{ form.Turno }}
+                            {% if form.Turno.errors %}
+                                <div class="text-danger small">{{ form.Turno.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'home' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save"></i> Registrar TENS
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="bi bi-question-circle"></i> ¿La persona no está registrada?</h6>
+                    <p class="mb-0">
+                        Primero debe <a href="{% url 'gestion:registrar_persona' %}" target="_blank">registrar los datos básicos</a> 
+                        antes de asignar el rol de TENS.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/buscar_persona.js' %}"></script>
+{% endblock %}

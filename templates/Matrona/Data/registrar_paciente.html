@@ -1,0 +1,246 @@
+{% extends 'Shared/base.html' %}
+{% load static %}
+
+{% block title %}Registrar Paciente - Sistema Obstétrico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-heart"></i> Registrar Nuevo Paciente
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Importante:</strong> La persona debe estar registrada previamente en el sistema. 
+                        Ingrese el RUT para vincular como paciente.
+                    </div>
+                    
+                    <form method="POST" id="form-paciente" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- RUT de la Persona -->
+                        <div class="mb-4">
+                            <label for="{{ form.rut_persona.id_for_label }}" class="form-label">
+                                {{ form.rut_persona.label }} <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                {{ form.rut_persona }}
+                                <button class="btn btn-outline-secondary" type="button" id="btn-buscar-paciente">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                            {% if form.rut_persona.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.rut_persona.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">{{ form.rut_persona.help_text }}</small>
+                        </div>
+                        
+                        <!-- Información de la persona -->
+                        <div id="info-persona" class="alert alert-success d-none mb-4" role="alert">
+                            <h6><i class="bi bi-person-check"></i> Datos de la Persona:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Nombre:</strong> <span id="nombre-persona"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>RUT:</strong> <span id="rut-persona"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Fecha Nac.:</strong> <span id="fecha-nac-persona"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Teléfono:</strong> <span id="telefono-persona"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="mb-3"><i class="bi bi-clipboard-data"></i> Datos del Paciente</h5>
+                        
+                        <!-- Edad y Estado Civil -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.Edad.id_for_label }}" class="form-label">
+                                    {{ form.Edad.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.Edad }}
+                                {% if form.Edad.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.Edad.errors }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Entre 12 y 60 años</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.Estado_civil.id_for_label }}" class="form-label">
+                                    {{ form.Estado_civil.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.Estado_civil }}
+                                {% if form.Estado_civil.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.Estado_civil.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Previsión -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.Previcion.id_for_label }}" class="form-label">
+                                    {{ form.Previcion.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.Previcion }}
+                                {% if form.Previcion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.Previcion.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Acompañante y Contacto de Emergencia -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.Acompañante.id_for_label }}" class="form-label">
+                                    {{ form.Acompañante.label }}
+                                </label>
+                                {{ form.Acompañante }}
+                                {% if form.Acompañante.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.Acompañante.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.Contacto_emergencia.id_for_label }}" class="form-label">
+                                    {{ form.Contacto_emergencia.label }}
+                                </label>
+                                {{ form.Contacto_emergencia }}
+                                {% if form.Contacto_emergencia.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.Contacto_emergencia.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'matrona:lista_pacientes' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-save"></i> Registrar Paciente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Card de ayuda -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="bi bi-question-circle"></i> ¿La persona no está registrada?</h6>
+                    <p class="mb-0">
+                        Primero debe <a href="{% url 'gestion:registrar_persona' %}">registrar los datos básicos de la persona</a> 
+                        antes de asignarle el rol de paciente.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Buscar persona por RUT
+document.getElementById('btn-buscar-paciente').addEventListener('click', function() {
+    const rut = document.getElementById('rut_persona_paciente').value;
+    
+    if (!rut) {
+        alert('Por favor ingrese un RUT');
+        return;
+    }
+    
+    // ✅ CORREGIDO: Petición AJAX a la ruta correcta de matronaApp
+    fetch(`/matrona/api/persona/buscar/?rut=${encodeURIComponent(rut)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.encontrado) {
+                if (data.es_paciente) {
+                    alert('⚠️ Esta persona ya está registrada como paciente.');
+                    document.getElementById('info-persona').classList.add('d-none');
+                    return;
+                }
+                
+                // Mostrar información de la persona
+                const persona = data.persona;
+                document.getElementById('nombre-persona').textContent = persona.nombre_completo;
+                document.getElementById('rut-persona').textContent = persona.rut;
+                document.getElementById('fecha-nac-persona').textContent = persona.fecha_nacimiento;
+                document.getElementById('telefono-persona').textContent = persona.telefono || 'No registrado';
+                document.getElementById('info-persona').classList.remove('d-none');
+                
+                // Calcular edad automáticamente
+                if (persona.fecha_nacimiento) {
+                    const hoy = new Date();
+                    const nacimiento = new Date(persona.fecha_nacimiento);
+                    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+                    const mes = hoy.getMonth() - nacimiento.getMonth();
+                    
+                    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+                        edad--;
+                    }
+                    
+                    document.querySelector('input[name="Edad"]').value = edad;
+                }
+            } else {
+                alert(data.mensaje || 'No se encontró una persona con ese RUT');
+                document.getElementById('info-persona').classList.add('d-none');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al buscar la persona. Por favor intente nuevamente.');
+        });
+});
+
+// Validación del formulario
+document.getElementById('form-paciente').addEventListener('submit', function(e) {
+    const form = this;
+    
+    if (!form.checkValidity()) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    form.classList.add('was-validated');
+});
+
+// Formatear RUT mientras se escribe
+document.getElementById('rut_persona_paciente').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/[^0-9kK]/g, '');
+    
+    if (value.length > 1) {
+        value = value.slice(0, -1) + '-' + value.slice(-1);
+    }
+    
+    e.target.value = value.toUpperCase();
+});
+
+console.log('✅ Formulario de registro de paciente cargado');
+</script>
+{% endblock %}
