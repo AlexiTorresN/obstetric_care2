@@ -11,20 +11,31 @@ jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
-    
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_obstetric_care
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
-    # Checkout del código
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # Necesario para el análisis de SonarCloud
-    
-    # Configurar Python
+        fetch-depth: 0
+
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
-    # Cache de dependencias pip
+
     - name: Cache pip packages
       uses: actions/cache@v3
       with:
@@ -32,49 +43,43 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    
-    # Instalar dependencias
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install coverage pytest pytest-django pytest-cov
-        pip install cryptography
+        pip install coverage pytest pytest-django pytest-cov cryptography
 
-    # Configurar base de datos de prueba
-    - name: Setup test database
+    - name: Wait for MySQL
       run: |
-        sudo systemctl start mysql
-        mysql -e 'CREATE DATABASE IF NOT EXISTS test_obstetric_care;' -uroot -proot
-    
-    # Ejecutar tests con coverage
+        echo "Esperando MySQL..."
+        for i in {1..20}; do
+          mysqladmin ping -h 127.0.0.1 -uroot -proot && break
+          sleep 2
+        done
+
     - name: Run tests with coverage
       env:
         DJANGO_SETTINGS_MODULE: obstetric_care.settings
-        DATABASE_URL: sqlite:///test.db
-        SECRET_KEY: test-secret-key-for-ci
+        SECRET_KEY: test-secret
         DEBUG: False
+        MYSQL_HOST: 127.0.0.1
+        MYSQL_USER: root
+        MYSQL_PASSWORD: root
+        MYSQL_PORT: 3306
+        MYSQL_DATABASE: test_obstetric_care
       run: |
-        # Ejecutar migraciones de prueba
-        python manage.py migrate --run-syncdb --noinput
-        
-        # Ejecutar tests con coverage
+        python manage.py migrate --noinput
         coverage run --source='.' manage.py test
         coverage xml
         coverage report
-        
-        # Mostrar reporte en consola
-        echo "Coverage Report:"
-        coverage report --skip-covered --skip-empty
-    
-    # Análisis de seguridad con Bandit
+
     - name: Run Bandit Security Analysis
       continue-on-error: true
       run: |
         pip install bandit
         bandit -r . -f json -o bandit.json --skip B101,B601 || true
-    
-    # SonarCloud Scan
+
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
       env:
