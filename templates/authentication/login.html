@@ -1,0 +1,341 @@
+<!-- templates/authentication/login.html -->
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Gestión Obstétrica - Login">
+    <title>Iniciar Sesión - Sistema Obstétrico</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 90%;
+        }
+
+        .login-image {
+            background: url('{% static "images/medical-bg.jpg" %}') center/cover,
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .login-form-section {
+            padding: 3rem;
+        }
+
+        .hospital-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .form-control {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 5px;
+        }
+
+        .role-medico { background: #e3f2fd; color: #1565c0; }
+        .role-matrona { background: #fce4ec; color: #c2185b; }
+        .role-tens { background: #e8f5e9; color: #2e7d32; }
+        .role-admin { background: #fff3e0; color: #e65100; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="login-container">
+                    <div class="row g-0">
+                        <!-- Lado Izquierdo - Información -->
+                        <div class="col-lg-5 d-none d-lg-block">
+                            <div class="login-image">
+                                <div class="text-center p-4">
+                                    <i class="bi bi-hospital" style="font-size: 4rem;"></i>
+                                    <h2 class="mt-3 mb-4">Sistema de Gestión Obstétrica</h2>
+                                    <p class="mb-4">Control integral de atención materno-infantil</p>
+                                    
+                                    <div class="mt-5">
+                                        <h5 class="mb-3">Roles del Sistema:</h5>
+                                        <div>
+                                            <span class="role-badge role-medico">
+                                                <i class="bi bi-person-badge"></i> Médico
+                                            </span>
+                                            <span class="role-badge role-matrona">
+                                                <i class="bi bi-person-heart"></i> Matrona
+                                            </span>
+                                            <span class="role-badge role-tens">
+                                                <i class="bi bi-person-check"></i> TENS
+                                            </span>
+                                            <span class="role-badge role-admin">
+                                                <i class="bi bi-shield-lock"></i> Admin
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lado Derecho - Formulario -->
+                        <div class="col-lg-7">
+                            <div class="login-form-section">
+                                <!-- Logo -->
+                                <div class="hospital-logo">
+                                    <i class="bi bi-hospital text-white" style="font-size: 2.5rem;"></i>
+                                </div>
+                                
+                                <!-- Título -->
+                                <h3 class="text-center mb-2">Iniciar Sesión</h3>
+                                <p class="text-center text-muted mb-4">
+                                    Ingrese sus credenciales para acceder al sistema
+                                </p>
+
+                                <!-- Mensajes de Error/Éxito -->
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                            <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        {% for error in form.non_field_errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Formulario -->
+                                <form method="POST" action="{% url 'login' %}" novalidate>
+                                    {% csrf_token %}
+                                    
+                                    <!-- Campo Usuario -->
+                                    <div class="mb-4">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                                            <i class="bi bi-person"></i> Usuario o RUT
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-person-fill"></i>
+                                            </span>
+                                            {{ form.username|add_class:"form-control"|attr:"placeholder:Ej: 12345678-9 o usuario" }}
+                                        </div>
+                                        {% if form.username.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.username.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Campo Contraseña -->
+                                    <div class="mb-4">
+                                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                                            <i class="bi bi-lock"></i> Contraseña
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </span>
+                                            {{ form.password|add_class:"form-control"|attr:"placeholder:Ingrese su contraseña" }}
+                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                <i class="bi bi-eye" id="toggleIcon"></i>
+                                            </button>
+                                        </div>
+                                        {% if form.password.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.password.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Recordar sesión -->
+                                    <div class="mb-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="rememberMe" name="remember_me">
+                                            <label class="form-check-label" for="rememberMe">
+                                                Mantener sesión iniciada
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Botón Login -->
+                                    <button type="submit" class="btn btn-login mb-3">
+                                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                                    </button>
+
+                                    <!-- Links adicionales -->
+                                    <div class="text-center">
+                                        <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                                            <i class="bi bi-key"></i> ¿Olvidó su contraseña?
+                                        </a>
+                                    </div>
+                                </form>
+
+                                <!-- Información de Seguridad -->
+                                <hr class="my-4">
+                                <div class="text-center text-muted small">
+                                    <i class="bi bi-shield-check text-success"></i> 
+                                    Conexión segura y encriptada
+                                    <br>
+                                    <span class="text-muted">
+                                        © 2024 Sistema de Gestión Obstétrica v1.0
+                                    </span>
+                                </div>
+
+                                <!-- Botón de Ayuda Flotante -->
+                                <button class="btn btn-sm btn-outline-secondary position-fixed bottom-0 end-0 m-3" 
+                                        data-bs-toggle="modal" data-bs-target="#helpModal">
+                                    <i class="bi bi-question-circle"></i> Ayuda
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ayuda -->
+    <div class="modal fade" id="helpModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-question-circle"></i> Ayuda de Acceso
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Credenciales de Prueba:</h6>
+                    <ul>
+                        <li><strong>Médico:</strong> medico.demo / Pass123!</li>
+                        <li><strong>Matrona:</strong> matrona.demo / Pass123!</li>
+                        <li><strong>TENS:</strong> tens.demo / Pass123!</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">¿Problemas para ingresar?</h6>
+                    <p>Contacte al administrador del sistema:</p>
+                    <p>
+                        <i class="bi bi-telephone"></i> +56 2 2345 6789<br>
+                        <i class="bi bi-envelope"></i> soporte@hospital.cl
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

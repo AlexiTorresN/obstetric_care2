@@ -6,19 +6,26 @@ omit =
     */tests/*
     */test_*.py
     */venv/*
-    */virtualenv/*
+    */Lib/*
+    */site-packages/*
     manage.py
-    */settings/*
+    */settings.py
     */wsgi.py
     */asgi.py
     */apps.py
     */admin.py
-    */urls.py
+    obstetric_care/urls.py
 
 [report]
 precision = 2
 skip_covered = False
 show_missing = True
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
 
 [xml]
 output = coverage.xml
