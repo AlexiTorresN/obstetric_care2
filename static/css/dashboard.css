@@ -1,0 +1,296 @@
+/* ====================================
+   DASHBOARD ADMINISTRATIVO - CSS
+   Sistema Obstétrico
+   ==================================== */
+
+/* Variables de colores personalizados */
+:root {
+    --color-medico: #0d6efd;
+    --color-matrona: #d63384;
+    --color-tens: #198754;
+    --color-paciente: #dc3545;
+    --color-admin: #6c757d;
+    --shadow-light: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
+    --transition-smooth: all 0.3s ease;
+}
+
+/* Color personalizado rosa para matronas */
+.bg-pink {
+    background-color: var(--color-matrona) !important;
+}
+
+.text-pink {
+    color: var(--color-matrona) !important;
+}
+
+.btn-pink {
+    background-color: var(--color-matrona);
+    color: white;
+    border: none;
+}
+
+.btn-pink:hover {
+    background-color: #b8256f;
+    color: white;
+}
+
+.btn-outline-pink {
+    border-color: var(--color-matrona);
+    color: var(--color-matrona);
+}
+
+.btn-outline-pink:hover {
+    background-color: var(--color-matrona);
+    color: white;
+}
+
+/* Card de bienvenida con gradiente */
+.welcome-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.welcome-card h2 {
+    font-weight: 700;
+}
+
+/* Estilos para las tarjetas de roles */
+.role-card {
+    transition: var(--transition-smooth);
+    border-left: 4px solid transparent;
+}
+
+.role-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.role-medico {
+    border-left-color: var(--color-medico);
+}
+
+.role-matrona {
+    border-left-color: var(--color-matrona);
+}
+
+.role-tens {
+    border-left-color: var(--color-tens);
+}
+
+.role-paciente {
+    border-left-color: var(--color-paciente);
+}
+
+/* Iconos de roles */
+.role-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+}
+
+/* Badges personalizados */
+.badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Botones con mejor diseño */
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Cards con sombra suave */
+.card {
+    box-shadow: var(--shadow-light);
+    transition: var(--transition-smooth);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* Navbar con efecto glassmorphism */
+.navbar {
+    backdrop-filter: blur(10px);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+}
+
+/* Estadísticas */
+.stat-box {
+    transition: var(--transition-smooth);
+    border: 1px solid transparent;
+}
+
+.stat-box:hover {
+    border-color: #dee2e6;
+    transform: scale(1.02);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Lista de acciones rápidas */
+.list-group-item {
+    transition: var(--transition-smooth);
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+/* Progress bars personalizadas */
+.progress {
+    border-radius: 10px;
+    overflow: visible;
+}
+
+.progress-bar {
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+/* Footer info */
+.alert-light {
+    background-color: #f8f9fa;
+}
+
+/* Responsive ajustes */
+@media (max-width: 768px) {
+    .role-card {
+        margin-bottom: 1rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .welcome-card h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Animaciones sutiles */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.role-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.role-card:nth-child(1) { animation-delay: 0.1s; }
+.role-card:nth-child(2) { animation-delay: 0.2s; }
+.role-card:nth-child(3) { animation-delay: 0.3s; }
+.role-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Card footer */
+.card-footer {
+    padding: 0.75rem 1.25rem;
+}
+
+/* Mejoras de tipografía */
+h5, h6 {
+    font-weight: 600;
+}
+
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+/* Efectos de glassmorphism en cards */
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+/* Dropdown menus mejorados */
+.dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow-hover);
+    border-radius: 0.5rem;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.25rem;
+    transition: var(--transition-smooth);
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    padding-left: 1.5rem;
+}
+
+/* Badge con animación de pulso */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.badge {
+    animation: pulse 2s infinite;
+}
+
+/* Mejora del contraste de texto */
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Espaciado consistente */
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+/* Bordes redondeados consistentes */
+.rounded-3 {
+    border-radius: 1rem !important;
+}

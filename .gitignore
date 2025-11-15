@@ -1,8 +1,4 @@
-# ========================
-# PYTHON + DJANGO PROJECT
-# ========================
-
-# Byte-compiled / cache
+# .gitignore
 # ========================
 # PYTHON + DJANGO PROJECT
 # ========================
@@ -11,74 +7,149 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Virtual environments
-*.py[cod]
-*$py.class
+*.pyc
+.pytest_cache/
+.cache/
 
 # Virtual environments
 .env
-.venv/
+.venv
 venv/
-ENV/
 env/
+ENV/
+virtualenv/
+Lib/
+Scripts/
+Include/
+pip-selfcheck.json
+pyvenv.cfg
 
 # Django stuff
 *.log
+*.pot
 db.sqlite3
+db.sqlite3-journal
+test_db.sqlite3
+local_settings.py
 media/
 staticfiles/
-static/
-*.pot
-*.pyc
+static/admin/
+static/rest_framework/
 
-# Django migrations (mantiene solo __init__.py)
-**/migrations/*
+# Django migrations
+**/migrations/*.py
 !**/migrations/__init__.py
-ENV/
-env/
+**/migrations/*.pyc
 
-# Django stuff
+# Security - NUNCA subir estos
+secrets.json
+*.key
+*.pem
+obstetric_care/settings_production.py
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+*.cover
+.hypothesis/
+# NO ignorar coverage.xml - SonarCloud lo necesita
+# coverage.xml
+
+# Testing
+test_settings.py
+.tox/
+nosetests.xml
 *.log
-db.sqlite3
-media/
-staticfiles/
-static/
-*.pot
-*.pyc
 
-# Django migrations (mantiene solo __init__.py)
-**/migrations/*
-!**/migrations/__init__.py
-
-# IDE / Editor settings
 # IDE / Editor settings
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
-
-# Cache
-.cache/
-.pytest_cache/
-.coverage
-*.cover
-*.py,cover
-htmlcov/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.history/
 
 # OS generated files
 .DS_Store
-Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 ehthumbs.db
+Thumbs.db
 desktop.ini
 
-# Other
+# Backup files
 *.bak
 *.swp
+*.swo
+*~
 *.tmp
-*.bat
+.temp/
 
-# PowerShell script files
-*.ps1
-*.psm1
-*.psd1
+# Package files
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+
+# Documentation
+docs/_build/
+site/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# CUSTOM PROJECT EXCLUSIONS
+# ========================
+
+# Legacy system files (si tienes)
+legacy_data/
+old_backup/
+
+# Local development
+local_*.py
+*.local
+
+# Temporary test files
+test_*.db
+temp_*.json
