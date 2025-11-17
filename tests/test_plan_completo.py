@@ -618,8 +618,6 @@ def pytest_collection_modifyitems(items):
 # ============================================
 
 """
-COMANDOS ÚTILES PARA EJECUTAR LOS TESTS:
-
 # Ejecutar todos los tests
 pytest tests/test_plan_completo.py -v
 
