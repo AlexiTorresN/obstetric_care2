@@ -41,3 +41,36 @@ matronaApp/migrations/__pycache__/0001_initial.cpython-313.pyc
 medicoApp/migrations/__pycache__/0001_initial.cpython-313.pyc
 partosApp/migrations/__pycache__/0001_initial.cpython-313.pyc
 tensApp/migrations/__pycache__/0001_initial.cpython-313.pyc
+tests/test old/__pycache__/test_urls_exist.cpython-313-pytest-8.4.2.pyc
+tests/test old/__pycache__/test_paciente_detail.cpython-313-pytest-8.4.2.pyc
+tests/test old/__pycache__/test_legacy_smoke.cpython-313-pytest-8.4.2.pyc
+tests/test old/__pycache__/test_healthcheck.cpython-313-pytest-8.4.2.pyc
+tests/__pycache__/test_plan_completo.cpython-313-pytest-8.4.2.pyc
+tensApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+recienNacidoApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+partosApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+matronaApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+medicoApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+legacyApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+inicioApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+ingresoPartoApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+gestionApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+__pycache__/locustfile.cpython-313.pyc
+gestionApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+inicioApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+legacyApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+xevaluacion 2/test/README_TESTING.md
+xevaluacion 2/test/PLANTILLA_REPORTE_EJECUTIVO.md
+xevaluacion 2/test/Plan_Pruebas_Sistema_Obstetrico_PARTE1.docx
+xevaluacion 2/test/Plan_Pruebas_Sistema_Obstetrico_PARTE2_CODIGO.docx
+xevaluacion 2/test/Plan_de_Pruebas_Sistema_Obstetrico.md
+xevaluacion 2/test/Plan_Pruebas_Completo_FINAL.docx
+locustfile.py
+tensApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+medicoApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+legacyApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+medicoApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+legacyApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+inicioApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+gestionApp/forms/__pycache__/persona_forms.cpython-313.pyc
+gestionApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
