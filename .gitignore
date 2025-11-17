@@ -74,3 +74,5 @@ legacyApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
 inicioApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
 gestionApp/forms/__pycache__/persona_forms.cpython-313.pyc
 gestionApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
+*.pyc
+legacyApp/__pycache__/tests.cpython-313-pytest-8.4.2.pyc
