@@ -153,3 +153,8 @@ local_*.py
 # Temporary test files
 test_*.db
 temp_*.json
+
+# Archivos de Documentacion
+.xevaluacion 2/
+xevaluacion 2/
+xevaluacion 2/*
