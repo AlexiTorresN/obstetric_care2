@@ -7,12 +7,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Q, Count
 from medicoApp.models import Patologias
+# cargamos los decoradores para validar los accesos
+from core.decorators import role_required
 
 
 # ============================================
 # VISTA PRINCIPAL DEL MÓDULO MÉDICO
 # ============================================
-
+@role_required("Médico") # Llamada al decorador para validar el acceso va de la mani con app_name
 def menu_medico(request):
     """Vista principal del módulo Médico"""
     context = {

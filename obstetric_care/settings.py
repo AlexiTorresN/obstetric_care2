@@ -38,6 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Agregamos las apps para 2FA
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "two_factor",    
 
     # ✅ Apps de terceros (AGREGAR)
     'crispy_forms',              # Formularios con Bootstrap
@@ -71,6 +75,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'debug_toolbar.middleware.DebugToolbarMiddleware',  # Barra de debug (solo desarrollo)
+    
+    # Agregamos el nuevo Middleware creado para validacion de roles y accesos
+    'core.middleware.role_gatekeeper.RoleGatekeeperMiddleware',
+    # Agregamos el Middleware para 2FA
+    "django_otp.middleware.OTPMiddleware",
 ]
 
 ROOT_URLCONF = 'obstetric_care.urls'
