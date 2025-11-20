@@ -1,28 +1,34 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
 from inicioApp import views as inicio_views
-from core.views import custom_403 
+from core.views import custom_403
 
-# Handler para rediccion a paginas con errores HTML
+# Handler de error
 handler403 = 'core.views.custom_403'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+
     # Página principal
     path('', inicio_views.home, name='home'),
-    
+
     # Apps del sistema
     path('gestion/', include('gestionApp.urls')),
     path('matrona/', include('matronaApp.urls')),
     path('medico/', include('medicoApp.urls')),
     path('tens/', include('tensApp.urls')),
-    path('partos/', include('partosApp.urls')), 
+    path('partos/', include('partosApp.urls')),
 
-    # incluimos la nueva app core
-    path("", include("core.urls")),
+    # Core (en una ruta distinta para evitar colisión con la raíz)
+    path('core/', include('core.urls')),
 
-    # incluimos el path para 2FA
-    path('', include('two_factor.urls', 'two_factor')),
+    # Autenticación 2FA
+    path('2fa/', include('two_factor.urls')),
+]
 
-]   
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ]

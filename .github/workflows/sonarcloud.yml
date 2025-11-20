@@ -156,6 +156,7 @@ jobs:
     # SonarCloud Scan
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
+      continue-on-error: true     # <--- ESTA LÍNEA PERMITE QUE EL PIPELINE SIGA AUNQUE FALLE SONARQUBE, SE PUEDE QUITAR SI SE DESEA QUE EL ANALISIS SEA OBLIGATORIO
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

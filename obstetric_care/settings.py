@@ -50,8 +50,8 @@ INSTALLED_APPS = [
     'phonenumber_field',         # Validación de teléfonos
     'django_filters',            # Filtros avanzados
     'rest_framework',            # API REST
-    'debug_toolbar',             # Barra de debug (solo desarrollo)
-    'django_extensions',         # Extensiones de Django    
+    #'debug_toolbar',             # Barra de debug (solo desarrollo)
+    #'django_extensions',         # Extensiones de Django    
 
     # ✅ Apps de Obtetric Care
     'inicioApp',
@@ -74,13 +74,25 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'debug_toolbar.middleware.DebugToolbarMiddleware',  # Barra de debug (solo desarrollo)
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',  # Barra de debug (solo desarrollo)
     
     # Agregamos el nuevo Middleware creado para validacion de roles y accesos
     'core.middleware.role_gatekeeper.RoleGatekeeperMiddleware',
     # Agregamos el Middleware para 2FA
     "django_otp.middleware.OTPMiddleware",
 ]
+
+# Debug Toolbar solo en desarrollo
+if DEBUG:
+    INSTALLED_APPS += [
+        'debug_toolbar',
+        'django_extensions',
+    ]
+
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+
+    INTERNAL_IPS = ["127.0.0.1"]
+
 
 ROOT_URLCONF = 'obstetric_care.urls'
 
