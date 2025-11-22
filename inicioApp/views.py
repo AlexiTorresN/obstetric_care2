@@ -1,18 +1,26 @@
-# inicioApp/views.py
-from django.shortcuts import render
-from gestionApp.models import Persona, Medico, Matrona, Tens, Paciente
+"""
+Vistas de la aplicación de inicio
+"""
+from django.shortcuts import render, redirect
 
 
 def home(request):
-    """Vista principal del sistema"""
+    """
+    Splash screen / Landing page pública
+    Si el usuario ya está autenticado, redirigir a su dashboard correspondiente
+    """
+    if request.user.is_authenticated:
+        # Redirigir según el rol
+        if request.user.is_superuser:
+            return redirect('admin:index')
+        elif request.user.groups.filter(name='Administrador').exists():
+            return redirect('authentication:dashboard_admin')
+        elif request.user.groups.filter(name='Médico').exists():
+            return redirect('authentication:dashboard_medico')
+        elif request.user.groups.filter(name='Matrona').exists():
+            return redirect('authentication:dashboard_matrona')
+        elif request.user.groups.filter(name='TENS').exists():
+            return redirect('authentication:dashboard_tens')
     
-    # Estadísticas básicas
-    context = {
-        'total_personas': Persona.objects.filter(Activo=True).count(),
-        'total_pacientes': Paciente.objects.filter(activo=True).count(),
-        'total_medicos': Medico.objects.filter(Activo=True).count(),
-        'total_matronas': Matrona.objects.filter(Activo=True).count(),
-        'total_tens': Tens.objects.filter(Activo=True).count(),
-    }
-    
-    return render(request, 'inicio/home.html', context)
+    # Si no está autenticado, mostrar splash screen
+    return render(request, 'inicio/home.html')

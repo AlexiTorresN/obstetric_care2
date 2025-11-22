@@ -100,4 +100,11 @@ urlpatterns = [
     path('medicamento/<int:medicamento_pk>/desactivar/', 
         views.desactivar_medicamento_ficha, 
         name='desactivar_medicamento'),
+
+    # ============================================
+    # GESTIÓN DE FICHAS DE REGISTRO E INGRESO
+    # ============================================
+    path('ficha/registrar/', views.registrar_ficha, name='registrar_ficha'),
+    path('ingreso/registrar/', views.registrar_ingreso, name='registrar_ingreso'),
+
 ]

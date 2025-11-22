@@ -191,7 +191,7 @@
                                 {% endif %}
 
                                 <!-- Formulario -->
-                                <form method="POST" action="{% url 'login' %}" novalidate>
+                                <form method="POST" action="{% url 'authentication:login' %}" novalidate>
                                     {% csrf_token %}
                                     
                                     <!-- Campo Usuario -->
@@ -250,9 +250,11 @@
 
                                     <!-- Links adicionales -->
                                     <div class="text-center">
-                                        <a href="{% url 'password_reset' %}" class="text-decoration-none">
-                                            <i class="bi bi-key"></i> ¿Olvidó su contraseña?
-                                        </a>
+                                        <!-- Recuperación de contraseña deshabilitada temporalmente -->
+                                        <small class="text-muted">
+                                            <i class="bi bi-info-circle"></i> 
+                                            Para recuperar contraseña, contacte al administrador
+                                        </small>
                                     </div>
                                 </form>
 

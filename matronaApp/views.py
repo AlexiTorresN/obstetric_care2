@@ -108,7 +108,6 @@ def registrar_paciente(request):
     
     return render(request, 'Matrona/Formularios/registrar_paciente.html', {'form': form})
 
-
 def buscar_paciente(request):
     """Buscar paciente por RUT o nombre"""
     query = request.GET.get('q', '').strip()
@@ -149,7 +148,6 @@ def registrar_ingreso(request):
     
     return render(request, 'Matrona/Formularios/registrar_ingreso.html', {'form': form})
 
-
 def detalle_ingreso(request, pk):
     """Ver detalle de un ingreso"""
     ingreso = get_object_or_404(
@@ -160,7 +158,6 @@ def detalle_ingreso(request, pk):
         'ingreso': ingreso,
         'paciente': ingreso.paciente
     })
-
 
 # ============================================
 # VISTAS DE FICHA OBSTÉTRICA
@@ -189,7 +186,6 @@ def seleccionar_paciente_ficha(request):
         'pacientes': pacientes,
         'query': query
     })
-
 
 def crear_ficha_obstetrica(request, paciente_pk):
     """
@@ -231,7 +227,6 @@ def crear_ficha_obstetrica(request, paciente_pk):
     
     return render(request, 'Matrona/Formularios/crear_ficha.html', context)
 
-
 def lista_fichas_paciente(request, paciente_pk):
     """
     Ver todas las fichas obstétricas de un paciente específico
@@ -254,7 +249,6 @@ def lista_fichas_paciente(request, paciente_pk):
         'paciente': paciente,
         'fichas': fichas
     })
-
 
 def detalle_ficha(request, pk):
     """
@@ -279,7 +273,6 @@ def detalle_ficha(request, pk):
         'paciente': ficha.paciente,
         'medicamentos': medicamentos,
     })
-
 
 def editar_ficha(request, pk):
     """
@@ -346,7 +339,6 @@ def editar_ficha(request, pk):
     
     return render(request, 'Matrona/Formularios/editar_ficha.html', context)
 
-
 def desactivar_ficha(request, pk):
     """
     Cerrar/desactivar una ficha obstétrica
@@ -365,7 +357,6 @@ def desactivar_ficha(request, pk):
     return render(request, 'Matrona/Formularios/toggle_ficha.html', {
         'ficha': ficha
     })
-
 
 def lista_todas_fichas(request):
     """
@@ -387,6 +378,10 @@ def lista_todas_fichas(request):
         'fichas': fichas
     })
 
+def registrar_ficha(request):
+    # Falta implementación
+    pass
+
 
 # ============================================
 # GESTIÓN DE PATOLOGÍAS (Placeholders)
@@ -397,17 +392,14 @@ def asignar_patologia(request, paciente_pk):
     messages.info(request, "ℹ️ Función en desarrollo. Use las fichas obstétricas para asignar patologías.")
     return redirect('matrona:detalle_paciente', pk=paciente_pk)
 
-
 def eliminar_patologia(request, paciente_pk, patologia_pk):
     """Eliminar una patología de un paciente (en desarrollo)"""
     messages.info(request, "ℹ️ Función en desarrollo. Use las fichas obstétricas para gestionar patologías.")
     return redirect('matrona:detalle_paciente', pk=paciente_pk)
 
-
 # ============================================
 # API REST (AJAX) - Para búsquedas dinámicas
 # ============================================
-
 def buscar_paciente_api(request):
     """
     Buscar paciente vía AJAX (retorna JSON)
@@ -446,7 +438,6 @@ def buscar_paciente_api(request):
             'encontrado': False,
             'mensaje': 'No se encontró un paciente activo con ese RUT'
         })
-
 
 def buscar_persona_api(request):
     """
@@ -494,11 +485,9 @@ def buscar_persona_api(request):
             'mensaje': 'No se encontró una persona con ese RUT'
         })
 
-
 # ============================================
 # GESTIÓN DE MEDICAMENTOS EN FICHAS
 # ============================================
-
 def agregar_medicamento_ficha(request, ficha_pk):
     """
     Vista para que la MATRONA asigne un medicamento a una ficha
@@ -539,7 +528,6 @@ def agregar_medicamento_ficha(request, ficha_pk):
         'paciente': ficha.paciente
     })
 
-
 def editar_medicamento_ficha(request, medicamento_pk):
     """
     Vista para que la MATRONA edite un medicamento asignado
@@ -576,7 +564,6 @@ def editar_medicamento_ficha(request, medicamento_pk):
         'ficha': ficha,
         'paciente': ficha.paciente
     })
-
 
 def desactivar_medicamento_ficha(request, medicamento_pk):
     """

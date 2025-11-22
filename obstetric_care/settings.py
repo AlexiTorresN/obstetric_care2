@@ -38,22 +38,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Agregamos las apps para 2FA
-    "django_otp",
-    "django_otp.plugins.otp_totp",
-    "two_factor",    
+    
+    # ============================================
+    # AUTENTICACIÓN 2FA (TEMPORALMENTE DESACTIVADO)
+    # ============================================
+    # "django_otp",
+    # "django_otp.plugins.otp_totp",
+    # "two_factor",    
 
-    # ✅ Apps de terceros (AGREGAR)
-    'crispy_forms',              # Formularios con Bootstrap
-    'crispy_bootstrap5',         # Templates de Bootstrap 5
-    'widget_tweaks',             # Widgets personalizados
-    'phonenumber_field',         # Validación de teléfonos
-    'django_filters',            # Filtros avanzados
-    'rest_framework',            # API REST
-    #'debug_toolbar',             # Barra de debug (solo desarrollo)
-    #'django_extensions',         # Extensiones de Django    
-
-    # ✅ Apps de Obtetric Care
+    # ============================================
+    # APPS DE TERCEROS
+    # ============================================
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'widget_tweaks',
+    'phonenumber_field',
+    'django_filters',
+    'rest_framework',
+    
+    # ============================================
+    # APPS DEL SISTEMA OBSTÉTRICO
+    # ============================================
+    'core',                      # Utilidades, decorators compartidos
+    'authentication',            # Gestión de autenticación y roles
     'inicioApp',
     'matronaApp',
     'medicoApp',
@@ -73,25 +80,25 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',  # Barra de debug (solo desarrollo)
     
-    # Agregamos el nuevo Middleware creado para validacion de roles y accesos
-    'core.middleware.role_gatekeeper.RoleGatekeeperMiddleware',
-    # Agregamos el Middleware para 2FA
-    "django_otp.middleware.OTPMiddleware",
+    # ✅ Middleware de autenticación y control de roles
+    'authentication.middleware.role_gatekeeper.RoleGatekeeperMiddleware',
+    
+    # Middleware para 2FA (TEMPORALMENTE DESACTIVADO)
+    # "django_otp.middleware.OTPMiddleware",
+    # "authentication.middleware.require_2fa.Require2FAMiddleware",
 ]
 
-# Debug Toolbar solo en desarrollo
-if DEBUG:
-    INSTALLED_APPS += [
-        'debug_toolbar',
-        'django_extensions',
-    ]
+# # Debug Toolbar solo en desarrollo
+# if DEBUG:
+#     INSTALLED_APPS += [
+#         'debug_toolbar',
+#         'django_extensions',
+#     ]
 
-    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+#     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
-    INTERNAL_IPS = ["127.0.0.1"]
+#     INTERNAL_IPS = ["127.0.0.1"]
 
 
 ROOT_URLCONF = 'obstetric_care.urls'

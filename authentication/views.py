@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
+from django.contrib.auth import login, logout as auth_logout
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
@@ -11,9 +12,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class CustomLoginView(LoginView):
     """
-    Vista personalizada de login con detección de rol
+    Vista personalizada de login con detección de rol y redirección inteligente
     """
     template_name = 'authentication/login.html'
     form_class = CustomLoginForm
@@ -25,24 +27,31 @@ class CustomLoginView(LoginView):
         """
         user = self.request.user
         
-        # Verificar rol y redirigir apropiadamente
+        # Superusuario → Django Admin
         if user.is_superuser:
+            logger.info(f'Superusuario {user.username} redirigido a admin')
             return reverse_lazy('admin:index')
         
-        # Verificar si tiene perfil médico
-        if hasattr(user, 'medico'):
-            return reverse_lazy('medico:dashboard')
+        # Verificar grupo y redirigir apropiadamente
+        if user.groups.filter(name='Administrador').exists():
+            return reverse_lazy('authentication:dashboard_admin')
         
-        # Verificar si tiene perfil matrona
-        if hasattr(user, 'matrona'):
-            return reverse_lazy('matrona:dashboard')
+        if user.groups.filter(name='Médico').exists():
+            return reverse_lazy('authentication:dashboard_medico')
         
-        # Verificar si tiene perfil TENS
-        if hasattr(user, 'tens'):
-            return reverse_lazy('tens:dashboard')
+        if user.groups.filter(name='Matrona').exists():
+            return reverse_lazy('authentication:dashboard_matrona')
         
-        # Por defecto, ir al dashboard general
-        return reverse_lazy('inicio:dashboard')
+        if user.groups.filter(name='TENS').exists():
+            return reverse_lazy('authentication:dashboard_tens')
+        
+        # Si no tiene rol definido, enviar a página de inicio
+        logger.warning(f'Usuario {user.username} sin rol definido')
+        messages.warning(
+            self.request, 
+            'No tienes un rol asignado. Contacta al administrador.'
+        )
+        return reverse_lazy('home')
     
     def form_valid(self, form):
         """
@@ -76,17 +85,13 @@ class CustomLoginView(LoginView):
         """
         Cuando el login falla
         """
-        # Log de auditoría
         username = form.cleaned_data.get('username', 'desconocido')
         logger.warning(f'Login fallido - Usuario: {username} - IP: {self.get_client_ip()}')
-        
         messages.error(self.request, 'Error al iniciar sesión. Verifique sus credenciales.')
         return super().form_invalid(form)
     
     def get_client_ip(self):
-        """
-        Obtener IP del cliente
-        """
+        """Obtener IP del cliente"""
         x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0]
@@ -95,67 +100,147 @@ class CustomLoginView(LoginView):
         return ip
     
     def get_user_role_display(self, user):
-        """
-        Obtener nombre del rol para mostrar
-        """
+        """Obtener nombre del rol para mostrar"""
         if user.is_superuser:
+            return "Super Administrador"
+        elif user.groups.filter(name='Administrador').exists():
             return "Administrador"
-        elif hasattr(user, 'medico'):
+        elif user.groups.filter(name='Médico').exists():
             return "Médico"
-        elif hasattr(user, 'matrona'):
+        elif user.groups.filter(name='Matrona').exists():
             return "Matrona"
-        elif hasattr(user, 'tens'):
+        elif user.groups.filter(name='TENS').exists():
             return "TENS"
         else:
             return "Usuario"
 
-class CustomLogoutView(LogoutView):
+
+# ============================================
+# LOGOUT - Vista que redirige al splash screen
+# ============================================
+def custom_logout_view(request):
     """
-    Vista personalizada de logout
+    Vista de logout que cierra sesión y redirige directamente al splash screen
+    Sin mostrar página intermedia de Django
     """
-    next_page = 'login'
+    if request.user.is_authenticated:
+        username = request.user.username
+        logger.info(f'Logout - Usuario: {username}')
+        
+        # Cerrar sesión
+        # auth_logout(request)
+        logout(request)
+        
+        # Mensaje de éxito
+        messages.success(request, 'Sesión cerrada correctamente. ¡Hasta pronto!')
     
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            logger.info(f'Logout - Usuario: {request.user.username}')
-            messages.info(request, 'Ha cerrado sesión exitosamente.')
-        return super().dispatch(request, *args, **kwargs)
+    # Redirigir directamente al splash screen
+    return redirect('home')
+
+
+# ============================================
+# DASHBOARDS POR ROL
+# ============================================
 
 @method_decorator(login_required, name='dispatch')
-class DashboardView(TemplateView):
-    """
-    Dashboard principal después del login
-    """
-    template_name = 'dashboard.html'
+class DashboardAdminView(TemplateView):
+    """Dashboard para Administradores"""
+    template_name = 'authentication/dashboards/dashboard_admin.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not (request.user.is_superuser or 
+                request.user.groups.filter(name='Administrador').exists()):
+            messages.error(request, 'No tienes permisos para acceder a esta sección.')
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
+        from gestionApp.models import Persona
+        from matronaApp.models import Paciente
+        from django.contrib.auth.models import User
         
-        # Determinar rol y permisos
-        context['user_role'] = self.get_user_role(user)
-        context['user_permissions'] = self.get_user_permissions(user)
-        
+        context.update({
+            'total_usuarios': User.objects.filter(is_active=True).count(),
+            'total_personas': Persona.objects.filter(Activo=True).count(),
+            'total_pacientes': Paciente.objects.filter(activo=True).count(),
+        })
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class DashboardMedicoView(TemplateView):
+    """Dashboard para Médicos"""
+    template_name = 'authentication/dashboards/dashboard_medico.html'
     
-    def get_user_role(self, user):
-        if user.is_superuser:
-            return 'admin'
-        elif hasattr(user, 'medico'):
-            return 'medico'
-        elif hasattr(user, 'matrona'):
-            return 'matrona'
-        elif hasattr(user, 'tens'):
-            return 'tens'
-        return 'usuario'
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='Médico').exists():
+            messages.error(request, 'No tienes permisos para acceder a esta sección.')
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
     
-    def get_user_permissions(self, user):
-        # Retornar permisos según el rol
-        permissions = {
-            'admin': ['all'],
-            'medico': ['view_all', 'edit_medical', 'prescribe'],
-            'matrona': ['view_patients', 'register_birth', 'prescribe_basic'],
-            'tens': ['view_assigned', 'administer_meds', 'vital_signs']
-        }
-        role = self.get_user_role(user)
-        return permissions.get(role, [])
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from medicoApp.models import Patologias
+        
+        context.update({
+            'total_patologias': Patologias.objects.filter(estado=True).count(),
+            'patologias_alto_riesgo': Patologias.objects.filter(
+                nivel_de_riesgo__in=['Alto', 'Critico'],
+                estado=True
+            ).count(),
+        })
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class DashboardMatronaView(TemplateView):
+    """Dashboard para Matronas"""
+    template_name = 'authentication/dashboards/dashboard_matrona.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='Matrona').exists():
+            messages.error(request, 'No tienes permisos para acceder a esta sección.')
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from matronaApp.models import FichaObstetrica, IngresoPaciente
+        from django.utils import timezone
+        
+        hoy = timezone.now().date()
+        
+        context.update({
+            'fichas_activas': FichaObstetrica.objects.filter(activa=True).count(),
+            'ingresos_hoy': IngresoPaciente.objects.filter(
+                fecha_ingreso=hoy
+            ).count(),
+        })
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class DashboardTensView(TemplateView):
+    """Dashboard para TENS"""
+    template_name = 'authentication/dashboards/dashboard_tens.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='TENS').exists():
+            messages.error(request, 'No tienes permisos para acceder a esta sección.')
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from matronaApp.models import AdministracionMedicamento
+        from django.utils import timezone
+        
+        hoy = timezone.now().date()
+        
+        context.update({
+            'administraciones_hoy': AdministracionMedicamento.objects.filter(
+                fecha_hora_administracion__date=hoy
+            ).count(),
+        })
+        return context

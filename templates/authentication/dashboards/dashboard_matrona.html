@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Matrona{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-heart-pulse me-2 text-danger"></i>Dashboard Matrona</h2>
+            <p class="text-muted">Bienvenida, {{ user.get_full_name|default:user.username }}</p>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-medical display-4 text-danger"></i>
+                    <h3 class="mt-3">{{ fichas_activas }}</h3>
+                    <p class="text-muted">Fichas Activas</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-hospital display-4 text-info"></i>
+                    <h3 class="mt-3">{{ ingresos_hoy }}</h3>
+                    <p class="text-muted">Ingresos Hoy</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-people display-4 text-success"></i>
+                    <h3 class="mt-3">0</h3>
+                    <p class="text-muted">Pacientes Asignadas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="row g-4">
+        <!-- Buscar Paciente -->
+        <div class="col-md-3">
+            <a href="{% url 'matrona:buscar_paciente' %}" class="card text-decoration-none">
+                <div class="card-body text-center">
+                    <i class="bi bi-search display-4 text-primary"></i>
+                    <h5 class="mt-3">Buscar Paciente</h5>
+                    <p class="text-muted small">Consultar fichas</p>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Nueva Ficha - Comentado hasta que exista la URL -->
+        <!--
+        <div class="col-md-3">
+            <a href="{% url 'matrona:registrar_ficha' %}" class="card text-decoration-none">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-plus display-4 text-success"></i>
+                    <h5 class="mt-3">Nueva Ficha</h5>
+                    <p class="text-muted small">Registrar ficha obstétrica</p>
+                </div>
+            </a>
+        </div>
+        -->
+        
+        <!-- Nuevo Ingreso - Comentado hasta que exista la URL -->
+        <!--
+        <div class="col-md-3">
+            <a href="{% url 'matrona:registrar_ingreso' %}" class="card text-decoration-none">
+                <div class="card-body text-center">
+                    <i class="bi bi-hospital display-4 text-info"></i>
+                    <h5 class="mt-3">Nuevo Ingreso</h5>
+                    <p class="text-muted small">Registrar ingreso</p>
+                </div>
+            </a>
+        </div>
+        -->
+        
+        <!-- Lista Pacientes -->
+        <div class="col-md-3">
+            <a href="{% url 'matrona:lista_pacientes' %}" class="card text-decoration-none">
+                <div class="card-body text-center">
+                    <i class="bi bi-list-ul display-4 text-warning"></i>
+                    <h5 class="mt-3">Lista Pacientes</h5>
+                    <p class="text-muted small">Ver todas las pacientes</p>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Placeholder para futuras funcionalidades -->
+        <div class="col-md-3">
+            <div class="card text-muted" style="opacity: 0.6; cursor: not-allowed;">
+                <div class="card-body text-center">
+                    <i class="bi bi-tools display-4"></i>
+                    <h5 class="mt-3">Próximamente</h5>
+                    <p class="text-muted small">Más funciones en desarrollo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mensaje informativo -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Nota:</strong> Algunas funcionalidades están en desarrollo y se habilitarán próximamente.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
